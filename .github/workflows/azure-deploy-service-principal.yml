@@ -137,10 +137,10 @@ jobs:
           echo "✓ Deployment completed successfully!"
           echo "Your app should be available at: https://${{ secrets.AZURE_APP_NAME }}.azurewebsites.net"
       
-      # Configure health check path
-      - name: Configure App Health Check
+      # Configure App Startup
+      - name: Configure App Startup
         run: |
-          echo "Configuring health check..."
+          echo "Configuring app settings..."
           
           # Set startup command
           az webapp config set \
@@ -148,13 +148,7 @@ jobs:
             --name ${{ secrets.AZURE_APP_NAME }} \
             --startup-file "node index.js"
           
-          # Set health check path
-          az webapp config set \
-            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-            --name ${{ secrets.AZURE_APP_NAME }} \
-            --health-check-path "/health"
-          
-          echo "✓ Health check configured!"
+          echo "✓ App configured!"
           
       # Logout from Azure
       - name: Logout from Azure
