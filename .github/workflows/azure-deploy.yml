@@ -19,10 +19,11 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '20'
-          cache: 'npm'
+          # Temporarily disable npm cache to avoid initial setup issues
+          # cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Create production env file
         run: |
@@ -46,6 +47,18 @@ jobs:
       - name: Azure Post-Build Tasks
         run: |
           echo "Running Azure post-build tasks..."
+          # Check if .next directory exists
+          if [ ! -d ".next" ]; then
+            echo "Error: .next directory does not exist. Build may have failed."
+            exit 1
+          fi
+          
+          # Check if standalone directory exists, create if not
+          if [ ! -d ".next/standalone" ]; then
+            echo "Creating missing standalone directory..."
+            mkdir -p .next/standalone
+          fi
+          
           # Ensure server.js is included in the deployment
           cp server.js .next/standalone/
           # Copy Azure-specific configuration
@@ -54,8 +67,16 @@ jobs:
           cp web.config .next/standalone/
           # Copy public assets
           cp -r public .next/standalone/
+          
+          # Create .next directory inside standalone if it doesn't exist
           mkdir -p .next/standalone/.next
-          cp -r .next/static .next/standalone/.next/
+          
+          # Copy static assets if they exist
+          if [ -d ".next/static" ]; then
+            cp -r .next/static .next/standalone/.next/
+          else
+            echo "Warning: .next/static directory not found."
+          fi
 
       - name: Login to Azure
         uses: azure/login@v1
