@@ -1,0 +1,40 @@
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Printer {
+  id        Int     @id @default(autoincrement())
+  name      String
+  status    String
+  ipAddress String?
+  location  String?
+  prints    PrintJob[]
+}
+
+model Material {
+  id       Int     @id @default(autoincrement())
+  name     String
+  type     String?
+  color    String?
+  quantity Float?
+  prints   PrintJob[]
+}
+
+model PrintJob {
+  id          Int       @id @default(autoincrement())
+  name        String
+  status      String
+  fileUrl     String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  printer     Printer   @relation(fields: [printerId], references: [id])
+  printerId   Int
+  material    Material  @relation(fields: [materialId], references: [id])
+  materialId  Int
+}

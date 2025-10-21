@@ -1,0 +1,96 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Roboto', sans-serif;
+}
+
+@layer base {
+  :root {
+    --background: 220 13% 97%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 208 100% 28%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 45 100% 51%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 208 100% 28%;
+    --chart-1: 208 100% 35%;
+    --chart-2: 120 50% 45%;
+    --chart-3: 200 80% 55%;
+    --chart-4: 47 100% 63%;
+    --chart-5: 300 65% 60%;
+    --radius: 0.75rem;
+
+    /* New Sidebar Theme - Matching Primary Blue */
+    --sidebar-background: 208 100% 28%; /* Exact match with primary color */
+    --sidebar-foreground: 0 0% 100%; /* Pure White */
+    --sidebar-primary: 45 100% 50%; /* Bright Yellow */
+    --sidebar-primary-foreground: 0 0% 0%; /* Black for text on yellow */
+    --sidebar-accent: 208 80% 38%; /* Lighter Blue for hover */
+    --sidebar-accent-foreground: 0 0% 100%; /* White */
+    --sidebar-border: 208 60% 20%; /* Dark Blue Border */
+    --sidebar-ring: 45 100% 50%; /* Matching Yellow */
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  
+  /* Force sidebar colors regardless of other styles */
+  .force-sidebar-colors {
+    background-color: hsl(208, 100%, 28%) !important;
+    color: white !important;
+  }
+  
+  .force-sidebar-active {
+    background: linear-gradient(to right, hsl(45, 100%, 50%), hsl(45, 100%, 55%)) !important;
+    color: black !important;
+    font-weight: bold !important;
+  }
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background-color: hsl(var(--muted));
+    border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--primary) / 0.5);
+    border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--primary));
+}

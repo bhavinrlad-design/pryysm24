@@ -1,0 +1,12 @@
+node_modules
+.next
+.env
+.DS_Store
+*.log
+*.msi
+.cache
+*.node
+*.dll
+*.exe
+build/
+dist/
