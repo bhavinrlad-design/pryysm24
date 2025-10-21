@@ -1,0 +1,102 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
+name: Build and deploy Node.js app to Azure Web App - PRYYSM-2
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read #This is required for actions/checkout
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js version
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22.x'
+          cache: 'npm'
+          
+      # Force update tailwindcss-animate in package-lock.json first, then install all dependencies
+      - name: Fix package-lock.json and install dependencies
+        run: |
+          # First try to install using npm install to update lock file
+          npm install --package-lock-only
+          # If that fails, try the direct approach
+          if [ $? -ne 0 ]; then
+            echo "Trying alternative approach to fix package-lock.json"
+            # Add tailwindcss-animate directly using npm install
+            npm install tailwindcss-animate --save-exact
+          fi
+          # Now install all dependencies
+          npm install
+        
+      - name: Create production env file
+        run: |
+          cat > .env.production << EOL
+          # Production environment variables
+          DATABASE_URL=${{ secrets.DATABASE_URL }}
+          NODE_ENV=production
+          NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
+          PORT=8080
+          EOL
+          
+      - name: Build application for Azure
+        run: npm run build:azure
+        
+      - name: Prepare for Azure deployment
+        run: |
+          # Copy necessary files for Azure deployment
+          cp server.js .next/standalone/ || echo "No server.js file found, skipping"
+          # Copy custom next config for Azure if it exists
+          cp next.config.azure.js .next/standalone/ || echo "No next.config.azure.js file found, skipping"
+          # Copy web.config if it exists
+          cp web.config .next/standalone/ || echo "No web.config file found, skipping"
+          # Copy static assets
+          mkdir -p .next/standalone/.next
+          cp -r .next/static .next/standalone/.next/ || echo "No static files found, skipping"
+          # Copy public folder if it exists
+          if [ -d "public" ]; then
+            cp -r public .next/standalone/
+          fi
+
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v4
+        with:
+          name: node-app
+          path: .next/standalone
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      id-token: write #This is required for requesting the JWT
+      contents: read #This is required for actions/checkout
+
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: node-app
+      
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: 'Deploy to Azure Web App'
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'PRYYSM-2'
+          slot-name: 'Production'
+          package: .
+
+          
