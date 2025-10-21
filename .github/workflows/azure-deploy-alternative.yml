@@ -102,11 +102,32 @@ jobs:
             echo "Warning: .next/static directory not found."
           fi
 
-      # Deploy directly to Azure App Service using publish profile
-      # Using v3 which has better support for publish profile deployment
-      - name: Deploy to Azure App Service with Publish Profile
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: ${{ secrets.AZURE_APP_NAME }}
-          publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
-          package: .next/standalone
+      # Create a deployment package
+      - name: Create deployment package
+        run: |
+          cd .next/standalone
+          zip -r ../../deploy.zip .
+          cd ../..
+          
+      # Deploy using Kudu Zip Deploy API with publish profile credentials
+      - name: Deploy to Azure App Service using Kudu API
+        run: |
+          # Extract deployment credentials from publish profile
+          # Parse the publish profile XML to get deployment credentials
+          echo "${{ secrets.AZURE_PUBLISH_PROFILE }}" > publishprofile.xml
+          
+          # Extract username and password from publish profile
+          DEPLOY_USER=$(grep -oP 'userName="[^"]*"' publishprofile.xml | head -1 | cut -d'"' -f2)
+          DEPLOY_PASS=$(grep -oP 'userPWD="[^"]*"' publishprofile.xml | head -1 | cut -d'"' -f2)
+          DEPLOY_URL=$(grep -oP 'publishUrl="[^"]*"' publishprofile.xml | head -1 | cut -d'"' -f2)
+          
+          # Deploy using Kudu API
+          curl -X POST \
+            -u "$DEPLOY_USER:$DEPLOY_PASS" \
+            --data-binary @deploy.zip \
+            -H "Content-Type: application/zip" \
+            "https://$DEPLOY_URL/api/zipdeploy"
+          
+          # Clean up
+          rm publishprofile.xml
+          echo "Deployment completed!"
