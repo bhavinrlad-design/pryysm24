@@ -1,4 +1,4 @@
-name: Deploy to Azure App Service (Alternative)
+name: Deploy to Azure App Service (Publish Profile)
 
 on:
   push:

@@ -6,7 +6,38 @@ A starter Next.js app scaffold for managing 3D prints, printers, and materials.
 
 This application is configured for deployment to Microsoft Azure App Service.
 
-### Azure Credentials Setup with Service Principal
+### Azure Credentials Setup (Publish Profile Method - RECOMMENDED)
+
+**This is the simplest and most reliable method for Azure deployment.**
+
+1. **Download the Publish Profile**:
+   - Go to the Azure Portal: https://portal.azure.com
+   - Navigate to your App Service
+   - Click on **"Get publish profile"** in the top menu (or Overview page)
+   - This will download a `.PublishSettings` XML file
+
+2. **Add GitHub Secrets**:
+   
+   Go to your GitHub repository settings: https://github.com/lad-pryysm/pryysm-v2/settings/secrets/actions
+
+   Create the following secrets:
+   - `AZURE_PUBLISH_PROFILE`: Open the downloaded `.PublishSettings` file in a text editor and copy the **ENTIRE CONTENTS** of the file
+   - `AZURE_APP_NAME`: Your Azure App Service name (e.g., "pryysm-web-app")
+   - `DATABASE_URL`: Your database connection string
+   - `NEXT_PUBLIC_API_URL`: Your app's public API endpoint (e.g., "https://pryysm-web-app.azurewebsites.net")
+
+3. **Deploy**:
+   - Push to the `new-main` branch to trigger automatic deployment
+   - Monitor the deployment in the GitHub Actions tab
+   - The workflow file used is `.github/workflows/azure-deploy-alternative.yml`
+
+> **Note**: The main workflow (`azure-deploy.yml`) is currently disabled due to service principal authentication complexities. The publish profile method is simpler and more reliable for most use cases.
+
+---
+
+### Alternative: Service Principal Method (Advanced)
+
+If you need to use service principal authentication for advanced scenarios: Azure Credentials Setup with Service Principal
 
 For GitHub Actions to deploy to Azure using a service principal, follow these steps:
 

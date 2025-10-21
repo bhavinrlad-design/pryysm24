@@ -1,19 +1,23 @@
-name: Deploy to Azure App Service
+name: Deploy to Azure App Service (DISABLED - Use alternative workflow)
 
 on:
-  push:
-    branches:
-      - main  # Set a branch name to trigger deployment
-      - new-main  # Also trigger deployment from new-main branch
-  workflow_dispatch:  # Allow manual triggering
+  # Temporarily disabled - use azure-deploy-alternative.yml instead
+  workflow_dispatch:  # Only manual trigger allowed
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Workflow Disabled
+        run: |
+          echo "This workflow is temporarily disabled due to authentication issues."
+          echo "Please use the azure-deploy-alternative.yml workflow instead."
+          echo "To enable this workflow, you need to:"
+          echo "1. Create a new service principal with: az ad sp create-for-rbac --name 'GitHub-Actions-Deploy' --role contributor --scopes /subscriptions/{YOUR-SUBSCRIPTION-ID}/resourceGroups/{YOUR-RESOURCE-GROUP} --sdk-auth"
+          echo "2. Copy the ENTIRE JSON output and save it as AZURE_CREDENTIALS secret in GitHub"
+          echo "3. Ensure the JSON includes clientSecret (not just the ID)"
+          exit 1
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
