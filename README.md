@@ -6,7 +6,19 @@ A starter Next.js app scaffold for managing 3D prints, printers, and materials.
 
 This application is configured for deployment to Microsoft Azure App Service using **OpenID Connect (OIDC)** - Microsoft's recommended authentication method.
 
-### Azure Setup with OpenID Connect (OIDC) - RECOMMENDED
+### ⚠️ Current Status: Secrets Not Yet Configured
+
+The workflow is failing because the required GitHub secrets are not set up. You have **two options**:
+
+#### Option 1: OpenID Connect (OIDC) - Recommended ✨
+More secure, uses the workflow: `.github/workflows/azure-deploy-alternative.yml`
+
+#### Option 2: Service Principal (Legacy) - Quick Setup 🔧
+Easier to set up initially, uses the workflow: `.github/workflows/azure-deploy-service-principal.yml`
+
+---
+
+### Option 1: Azure Setup with OpenID Connect (OIDC) - RECOMMENDED
 
 **This method uses OpenID Connect for secure, token-based authentication without storing long-lived credentials.**
 
@@ -94,6 +106,65 @@ Create the following secrets:
 - **Authentication Failed**: Check that federated credential subject matches: `repo:lad-pryysm/pryysm-v2:ref:refs/heads/new-main`
 - **Deployment Fails**: Ensure all GitHub secrets are correctly set
 - **Build Issues**: Check GitHub Actions logs for specific error messages
+
+---
+
+### Option 2: Service Principal Method (Simpler Setup)
+
+**If OIDC setup is complex, use this simpler method with the legacy service principal.**
+
+#### 1. Create Service Principal
+
+```bash
+# Login to Azure
+az login
+
+# Set your subscription
+az account set --subscription "Your-Subscription-Name-Or-ID"
+
+# Create service principal with credentials formatted for GitHub
+az ad sp create-for-rbac \
+  --name "GitHub-Actions-Pryysm" \
+  --role contributor \
+  --scopes /subscriptions/{YOUR-SUBSCRIPTION-ID}/resourceGroups/{YOUR-RESOURCE-GROUP} \
+  --sdk-auth
+```
+
+Copy the **ENTIRE JSON OUTPUT** from this command.
+
+#### 2. Add GitHub Secrets
+
+Go to: https://github.com/lad-pryysm/pryysm-v2/settings/secrets/actions
+
+| Secret Name | Description |
+|------------|-------------|
+| `AZURE_CREDENTIALS` | The entire JSON output from step 1 |
+| `AZURE_APP_NAME` | Your Azure App Service name |
+| `AZURE_RESOURCE_GROUP` | Your Azure Resource Group name |
+| `DATABASE_URL` | PostgreSQL connection string |
+| `NEXT_PUBLIC_API_URL` | `https://{AZURE_APP_NAME}.azurewebsites.net` |
+
+#### 3. Enable the Workflow
+
+The service principal workflow is at `.github/workflows/azure-deploy-service-principal.yml` and is set to manual trigger only. To use it:
+
+1. Go to GitHub Actions tab
+2. Select "Deploy to Azure (Service Principal - Legacy)"
+3. Click "Run workflow"
+
+Or change the workflow to auto-deploy on push by changing:
+```yaml
+on:
+  workflow_dispatch:  # Only manual trigger
+```
+to:
+```yaml
+on:
+  push:
+    branches:
+      - new-main
+  workflow_dispatch:
+```
 
 ---
 

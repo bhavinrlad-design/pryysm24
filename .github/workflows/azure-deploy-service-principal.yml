@@ -1,14 +1,9 @@
-name: Deploy to Azure App Service (OpenID Connect)
+name: Deploy to Azure (Service Principal - Legacy)
 
 on:
-  push:
-    branches:
-      - main
-      - new-main
-  workflow_dispatch:
+  workflow_dispatch:  # Only manual trigger for now
 
 permissions:
-  id-token: write
   contents: read
 
 env:
@@ -40,7 +35,6 @@ jobs:
           NODE_ENV=production
           NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
           PORT=8080
-          ${{ secrets.ADDITIONAL_ENV_VARS }}
           EOL
 
       - name: Run Prisma generate
@@ -109,22 +103,33 @@ jobs:
             echo "Warning: .next/static directory not found."
           fi
 
-      # Login to Azure using OpenID Connect (OIDC)
-      # Make sure you have AZURE_CLIENT_ID, AZURE_TENANT_ID, and AZURE_SUBSCRIPTION_ID secrets configured
+      # Login to Azure using Service Principal (Legacy method)
       - name: Login to Azure
-        uses: azure/login@v2
+        uses: azure/login@v1
         with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          enable-AzPSSession: false
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
           
-      # Deploy to Azure Web App using the official action
-      - name: Deploy to Azure App Service
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          package: .next/standalone
+      # Create a deployment package
+      - name: Create deployment package
+        run: |
+          cd .next/standalone
+          zip -r ../../deploy.zip .
+          cd ../..
+          
+      # Deploy using Azure CLI
+      - name: Deploy to Azure App Service using Azure CLI
+        run: |
+          echo "Starting deployment with Azure CLI..."
+          
+          # Deploy the ZIP file using Azure CLI
+          az webapp deployment source config-zip \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --name ${{ secrets.AZURE_APP_NAME }} \
+            --src deploy.zip \
+            --timeout 300
+          
+          echo "✓ Deployment completed successfully!"
+          echo "Your app should be available at: https://${{ secrets.AZURE_APP_NAME }}.azurewebsites.net"
           
       # Logout from Azure
       - name: Logout from Azure
