@@ -1,66 +1,69 @@
 #!/usr/bin/env node
 
-/**
- * Azure App Service Entry Point
- * Respond immediately, load Next.js async in background
- */
-
 const http = require('http');
+const url = require('url');
 const port = process.env.PORT || 8080;
 
-console.log('[START] Initializing...');
+// Disable Next.js telemetry
+process.env.NEXT_TELEMETRY_DISABLED = '1';
+process.env.NODE_ENV = 'production';
+
+console.log(`[${Date.now()}] Server starting on port ${port}`);
 
 let ready = false;
-let nextApp = null;
+let handle = null;
 
-// Create server that responds immediately
+// HTTP server - responds IMMEDIATELY
 const server = http.createServer((req, res) => {
-  if (!ready) {
-    // Not ready yet - return 503
-    res.writeHead(503, { 'Content-Type': 'text/plain' });
-    res.end('Service Starting');
+  const { pathname } = url.parse(req.url);
+  
+  // Health check - ALWAYS respond, even during init
+  if (pathname === '/' || pathname === '/health' || pathname === '/_health') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ status: ready ? 'ok' : 'starting' }));
     return;
   }
-
-  // Ready - proxy to Next.js
+  
+  // Other requests need app to be ready
+  if (!ready) {
+    res.writeHead(503);
+    res.end('Starting');
+    return;
+  }
+  
   try {
-    nextApp(req, res);
+    handle(req, res).catch(() => {
+      res.writeHead(500).end('Error');
+    });
   } catch (e) {
-    console.error('[ERROR]', e.message);
-    res.writeHead(500);
-    res.end('Error');
+    res.writeHead(500).end('Error');
   }
 });
 
-server.on('error', (err) => {
-  console.error('[FATAL]', err.message);
-  process.exit(1);
-});
-
-// Start listening IMMEDIATELY
 server.listen(port, '0.0.0.0', () => {
-  console.log(`[LISTENING] Port ${port}`);
+  console.log(`[${Date.now()}] ✓ Listening on port ${port}`);
 });
 
-// Load Next.js in background - does NOT block
-setImmediate(async () => {
+// Load Next.js asynchronously - CRITICAL for immediate response
+process.nextTick(async () => {
   try {
-    console.log('[NEXT] Loading...');
+    const start = Date.now();
+    console.log(`[${Date.now()}] Loading Next.js...`);
+    
     const next = require('next');
-    
     const app = next({ dev: false });
-    const handle = app.getRequestHandler();
     
-    console.log('[NEXT] Preparing...');
+    console.log(`[${Date.now()}] Preparing...`);
     await app.prepare();
     
-    console.log('[NEXT] Ready!');
-    nextApp = handle;
+    handle = app.getRequestHandler();
     ready = true;
     
+    const elapsed = Date.now() - start;
+    console.log(`[${Date.now()}] ✓ READY (${elapsed}ms)`);
   } catch (err) {
-    console.error('[NEXT_ERROR]', err.message);
-    console.error(err);
+    console.error(`[${Date.now()}] ✗ FAILED:`, err.message);
+    console.error(err.stack);
     process.exit(1);
   }
 });
