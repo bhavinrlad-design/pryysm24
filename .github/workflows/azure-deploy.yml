@@ -40,7 +40,16 @@ jobs:
         run: npx prisma generate
         
       - name: Build for Azure
-        run: npm run build:azure
+        run: |
+          # Create a copy of azure config as next.config.js temporarily
+          cp next.config.azure.js next.config.js.bak
+          cp next.config.azure.js next.config.js
+          
+          # Run the build
+          npm run build
+          
+          # Restore original next.config.js
+          mv next.config.js.bak next.config.js
         env:
           NODE_ENV: production
       

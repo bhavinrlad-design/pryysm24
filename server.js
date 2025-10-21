@@ -16,9 +16,12 @@ const configPath = isAzure && fs.existsSync(path.join(__dirname, 'next.config.az
   ? './next.config.azure.js' 
   : './next.config.js';
 
+// Load the configuration file
+const nextConfig = require(configPath);
+
 const app = next({ 
   dev,
-  conf: isAzure ? require(configPath) : undefined
+  conf: nextConfig
 });
 const handle = app.getRequestHandler();
 

@@ -14,7 +14,7 @@
     "start": "node server.js",
     "build:css": "postcss app/globals.css -o app/output.css",
     "azure-postbuild": "npm run build",
-    "build:azure": "cross-env NODE_ENV=production NEXT_PUBLIC_CONFIG_FILE=next.config.azure.js next build -c next.config.azure.js",
+    "build:azure": "cross-env NODE_ENV=production NEXT_CONFIG=next.config.azure.js next build",
     "start:azure": "cross-env NODE_ENV=production node server.js",
     "deploy:azure": "npm run build:azure && npm run start:azure"
   },
