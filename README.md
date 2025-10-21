@@ -6,11 +6,11 @@ A starter Next.js app scaffold for managing 3D prints, printers, and materials.
 
 This application is configured for deployment to Microsoft Azure App Service.
 
-### Azure Credentials Setup with OIDC (Recommended)
+### Azure Credentials Setup with Service Principal
 
-For GitHub Actions to deploy to Azure securely using OpenID Connect (OIDC), follow these steps:
+For GitHub Actions to deploy to Azure using a service principal, follow these steps:
 
-1. **Set up Azure App Registration and Federated Credentials**:
+1. **Create Service Principal and Get Credentials**:
 
    ```bash
    # Login to Azure (do this once)
@@ -19,53 +19,37 @@ For GitHub Actions to deploy to Azure securely using OpenID Connect (OIDC), foll
    # Set your subscription if you have multiple
    az account set --subscription "Your-Subscription-Name-Or-ID"
    
-   # Create an App Registration for GitHub Actions
-   az ad app create --display-name "GitHub-Actions-OIDC"
-   
-   # Get the Application (client) ID
-   clientId=$(az ad app list --display-name "GitHub-Actions-OIDC" --query "[0].appId" -o tsv)
-   echo "Client ID: $clientId"
-   
-   # Create a service principal for the application
-   az ad sp create --id $clientId
-   
-   # Get your subscription ID
-   subscriptionId=$(az account show --query id -o tsv)
-   echo "Subscription ID: $subscriptionId"
-   
-   # Get your tenant ID
-   tenantId=$(az account show --query tenantId -o tsv)
-   echo "Tenant ID: $tenantId"
-   
-   # Assign contributor role to the service principal for your resource group
-   az role assignment create \
+   # Create a service principal with contributor rights to your resource group
+   # AND format the output for GitHub Actions
+   az ad sp create-for-rbac --name "GitHub-Actions-Deploy" \
      --role contributor \
-     --assignee $clientId \
-     --scope /subscriptions/$subscriptionId/resourceGroups/{YOUR-RESOURCE-GROUP}
+     --scopes /subscriptions/{YOUR-SUBSCRIPTION-ID}/resourceGroups/{YOUR-RESOURCE-GROUP} \
+     --sdk-auth
    ```
 
-2. **Configure Federated Credentials**:
+   This command will output a JSON object in the correct format for GitHub Actions:
+   ```json
+   {
+     "clientId": "YOUR_CLIENT_ID",
+     "clientSecret": "YOUR_CLIENT_SECRET",
+     "subscriptionId": "YOUR_SUBSCRIPTION_ID",
+     "tenantId": "YOUR_TENANT_ID",
+     "activeDirectoryEndpointUrl": "https://login.microsoftonline.com",
+     "resourceManagerEndpointUrl": "https://management.azure.com/",
+     "activeDirectoryGraphResourceId": "https://graph.windows.net/",
+     "sqlManagementEndpointUrl": "https://management.core.windows.net:8443/",
+     "galleryEndpointUrl": "https://gallery.azure.com/",
+     "managementEndpointUrl": "https://management.core.windows.net/"
+   }
+   ```
 
-   * Go to the Azure Portal → Azure Active Directory → App Registrations
-   * Find and select your "GitHub-Actions-OIDC" app
-   * Go to "Certificates & secrets" → "Federated credentials"
-   * Create a new federated credential with these settings:
-     - Federated credential scenario: GitHub Actions deploying Azure resources
-     - Organization: `lad-pryysm`
-     - Repository: `pryysm-v2`
-     - Entity type: `Branch`
-     - GitHub branch: `new-main`
-     - Name: `github-actions-oidc`
-
-3. **Add Required GitHub Secrets**:
-   - `AZURE_CLIENT_ID`: The Application (client) ID you got from above
-   - `AZURE_TENANT_ID`: Your Azure AD tenant ID from above
-   - `AZURE_SUBSCRIPTION_ID`: Your Azure subscription ID from above
+2. **Add GitHub Secrets**:
+   - `AZURE_CREDENTIALS`: The **ENTIRE JSON OUTPUT** from the command above (copy and paste the whole thing)
    - `AZURE_APP_NAME`: Your Azure App Service name
    - `DATABASE_URL`: Your database connection string
    - `NEXT_PUBLIC_API_URL`: Your app's public API endpoint
 
-This OIDC approach is more secure because it doesn't require storing any secrets in GitHub.
+> **IMPORTANT**: Copy the entire JSON output exactly as shown, preserving all formatting. Any changes to the JSON structure will cause authentication to fail.
 
 ### Quick Start
 
@@ -115,11 +99,11 @@ Key environment variables for Azure deployment:
 
 #### Common Issues:
 
-1. **OIDC Authentication Errors**:
-   - Verify the federated credential is configured correctly in Azure AD
-   - Ensure GitHub repository name, branch name, and organization are exact matches
-   - Check that `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, and `AZURE_SUBSCRIPTION_ID` are correctly set
-   - Make sure the service principal has contributor access to your resource group
+1. **Service Principal Authentication Errors**:
+   - Make sure you used the `--sdk-auth` parameter when creating the service principal
+   - Ensure the `AZURE_CREDENTIALS` secret contains the **ENTIRE JSON** output from the `az ad sp create-for-rbac` command
+   - If you get "Invalid client secret" errors, try recreating the service principal
+   - Verify the JSON format is preserved exactly without any modifications
 
 2. **Deployment Failures**:
    - Check GitHub Actions logs for specific error messages
