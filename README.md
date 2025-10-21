@@ -12,19 +12,32 @@ For GitHub Actions to deploy to Azure, you need to set up the following secrets 
 
 1. Go to your GitHub repository settings: https://github.com/lad-pryysm/pryysm-v2/settings/secrets/actions
 
-2. Get your Azure Publish Profile:
-   - Go to the Azure Portal: https://portal.azure.com
-   - Navigate to your App Service
-   - Click on "Get publish profile" in the Overview page
-   - This will download a file with XML content
+2. Create Service Principal for Azure Authentication:
 
-3. Create the following GitHub repository secrets:
-   - `AZURE_PUBLISH_PROFILE`: The entire XML content from the downloaded publish profile file
-   - `AZURE_APP_NAME`: Your Azure App Service name
+   ```bash
+   # Login to Azure (do this once)
+   az login
+   
+   # Set your subscription if you have multiple
+   az account set --subscription "Your-Subscription-Name-Or-ID"
+   
+   # Create the service principal with contributor rights to your resource group
+   az ad sp create-for-rbac --name "pryysm-deploy" \
+     --role contributor \
+     --scopes /subscriptions/{subscription-id}/resourceGroups/{resource-group} \
+     --sdk-auth
+   ```
+
+   Replace `{subscription-id}` with your Azure Subscription ID and `{resource-group}` with your Azure Resource Group name.
+
+3. This command will output a JSON object. Copy the **entire JSON output** and save it as a GitHub secret named `AZURE_CREDENTIALS`.
+
+4. Create these additional GitHub repository secrets:
+   - `AZURE_APP_NAME`: Your Azure App Service name (e.g., "pryysm-web-app")
    - `DATABASE_URL`: Your database connection string
    - `NEXT_PUBLIC_API_URL`: Your app's public API endpoint
 
-This approach uses the publish profile for authentication, which is simpler and more reliable than service principal authentication.
+> **IMPORTANT**: Make sure the JSON format is preserved exactly when creating the `AZURE_CREDENTIALS` secret. Any extra spaces, line breaks, or formatting changes may cause authentication to fail.
 
 ### Quick Start
 
@@ -69,5 +82,24 @@ Key environment variables for Azure deployment:
 - `DATABASE_URL`: Connection string to your Azure database
 - `NODE_ENV`: Set to `production`
 - `NEXT_PUBLIC_API_URL`: Your app's public API endpoint
+
+### Troubleshooting Azure Deployment
+
+#### Common Issues:
+
+1. **Authentication Errors**:
+   - Ensure the `AZURE_CREDENTIALS` secret contains the **exact** JSON output from the `az ad sp create-for-rbac` command
+   - Verify there are no extra spaces, line breaks or formatting issues
+   - Make sure the service principal has contributor access to your resource group
+
+2. **Deployment Failures**:
+   - Check GitHub Actions logs for specific error messages
+   - Verify that `AZURE_APP_NAME` exactly matches your Azure App Service name
+   - Make sure your Azure subscription is active and has sufficient resources
+
+3. **Build Errors**:
+   - Review the build logs for TypeScript errors or missing dependencies
+   - Ensure all required environment variables are properly set
+   - Try running the build process locally to identify issues
 
 For detailed step-by-step instructions, troubleshooting tips, and advanced configuration options, see our [Complete Azure Deployment Guide](./docs/azure-deployment-guide.md).

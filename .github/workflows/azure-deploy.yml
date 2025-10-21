@@ -102,10 +102,17 @@ jobs:
             echo "Warning: .next/static directory not found."
           fi
 
-      # Deploy directly to Azure App Service using publish profile
+      # First authenticate with Azure
+      - name: Azure Login (Using Publish Profile for Auth)
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          
+      # Then deploy to Azure App Service using publish profile
       - name: Deploy to Azure App Service
+        id: deploy-to-azure
         uses: azure/webapps-deploy@v2
         with:
           app-name: ${{ secrets.AZURE_APP_NAME }}
-          publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
+          slot-name: 'production'  # Use 'production' as default slot
           package: .next/standalone
