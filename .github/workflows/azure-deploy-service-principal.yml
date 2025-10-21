@@ -81,6 +81,7 @@ jobs:
           # Copy entry point files
           cp index.js .next/standalone/
           cp server-simple.js .next/standalone/
+          cp test-server.js .next/standalone/
           cp web.config .next/standalone/
           
           # Copy public assets if the directory exists

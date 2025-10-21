@@ -1,9 +1,7 @@
 #!/usr/bin/env node
 
-// Entry point for Azure App Service
-// Simply requires the server module
-
-require('./server-simple.js');
+// TEMPORARY TEST: Use dumb server to verify HTTP works
+require('./test-server.js');
 
 
 
