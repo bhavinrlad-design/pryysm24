@@ -112,12 +112,28 @@ jobs:
       # Deploy using Kudu Zip Deploy API with publish profile credentials
       - name: Deploy to Azure App Service using Kudu API
         run: |
+          # Check if AZURE_PUBLISH_PROFILE secret is set
+          if [ -z "${{ secrets.AZURE_PUBLISH_PROFILE }}" ]; then
+            echo "ERROR: AZURE_PUBLISH_PROFILE secret is not set or is empty"
+            echo "Please add your Azure App Service publish profile to GitHub secrets"
+            echo "To get it: Azure Portal > App Service > Get Publish Profile"
+            exit 1
+          fi
+          
           # Extract deployment credentials from publish profile
           echo "${{ secrets.AZURE_PUBLISH_PROFILE }}" > publishprofile.xml
           
+          # Check if file was created successfully
+          if [ ! -s publishprofile.xml ]; then
+            echo "ERROR: Publish profile file is empty"
+            exit 1
+          fi
+          
           # Debug: Show first few lines of the profile
           echo "Analyzing publish profile..."
-          head -20 publishprofile.xml
+          echo "File size: $(wc -c < publishprofile.xml) bytes"
+          echo "First line:"
+          head -1 publishprofile.xml
           
           # Use xmllint to parse the XML properly
           # Install xmllint if not available
