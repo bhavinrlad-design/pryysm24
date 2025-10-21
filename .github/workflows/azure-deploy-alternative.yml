@@ -103,8 +103,9 @@ jobs:
           fi
 
       # Deploy directly to Azure App Service using publish profile
+      # Using v3 which has better support for publish profile deployment
       - name: Deploy to Azure App Service with Publish Profile
-        uses: azure/webapps-deploy@v2
+        uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ secrets.AZURE_APP_NAME }}
           publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
