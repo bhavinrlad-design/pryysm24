@@ -1,50 +1,78 @@
 #!/usr/bin/env node
 
 /**
- * Minimal Next.js server for Azure App Service
- * This avoids any database initialization on startup
+ * MINIMAL health-check server for Azure App Service
+ * Starts immediately while Next.js loads in the background
  */
 
-const { createServer } = require('http');
-const { parse } = require('url');
-const next = require('next');
-
-const dev = process.env.NODE_ENV !== 'production';
+const http = require('http');
 const port = parseInt(process.env.PORT || '8080', 10);
-const hostname = '0.0.0.0';
 
-console.log(`[STARTUP] Initializing Next.js server (${dev ? 'dev' : 'prod'})`);
+let appReady = false;
+let nextApp = null;
 
-const app = next({ dev, conf: {} });
-const handle = app.getRequestHandler();
+// Create immediate health-check server
+const server = http.createServer((req, res) => {
+  // Health checks should always respond
+  if (req.url === '/_health' || req.url === '/health') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ status: 'ok', ready: appReady }));
+    return;
+  }
 
-app.prepare()
-  .then(() => {
-    createServer((req, res) => {
-      // Health check endpoint
-      if (req.url === '/_health' || req.url === '/health') {
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ status: 'healthy', timestamp: new Date().toISOString() }));
-        return;
+  // If app isn't ready, return 503
+  if (!appReady) {
+    res.writeHead(503, { 'Content-Type': 'text/plain' });
+    res.end('Service Starting...');
+    return;
+  }
+
+  // Otherwise proxy to Next.js
+  if (nextApp && nextApp.handle) {
+    nextApp.handle(req, res);
+  } else {
+    res.writeHead(500);
+    res.end('Internal Error');
+  }
+});
+
+server.listen(port, '0.0.0.0', () => {
+  console.log(`[Server] Listening on port ${port}`);
+  
+  // Load Next.js in background
+  setTimeout(() => initializeNextApp(), 100);
+});
+
+async function initializeNextApp() {
+  try {
+    console.log('[Next.js] Initializing...');
+    const next = require('next');
+    const { parse } = require('url');
+    
+    const app = next({ dev: false });
+    await app.prepare();
+    
+    nextApp = {
+      handle: async (req, res) => {
+        try {
+          const parsedUrl = parse(req.url, true);
+          return await app.getRequestHandler()(req, res, parsedUrl);
+        } catch (err) {
+          console.error('[Error]', err);
+          res.statusCode = 500;
+          res.end('Error');
+        }
       }
+    };
+    
+    appReady = true;
+    console.log('[Next.js] Ready!');
+  } catch (err) {
+    console.error('[Next.js Error]', err.message);
+    // Keep server running even if Next.js fails
+    setTimeout(initializeNextApp, 5000);
+  }
+}
 
-      const parsedUrl = parse(req.url, true);
-      handle(req, res, parsedUrl).catch(err => {
-        console.error('[ERROR]', err);
-        res.statusCode = 500;
-        res.end('Internal Server Error');
-      });
-    }).listen(port, hostname, (err) => {
-      if (err) {
-        console.error('[ERROR] Failed to start server:', err);
-        process.exit(1);
-      }
-      console.log(`[SUCCESS] Server listening on ${hostname}:${port}`);
-    });
-  })
-  .catch(err => {
-    console.error('[ERROR] Failed to prepare app:', err);
-    process.exit(1);
-  });
 
 
