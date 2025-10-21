@@ -1,78 +1,114 @@
 #!/usr/bin/env node
 
 /**
- * MINIMAL health-check server for Azure App Service
- * Starts immediately while Next.js loads in the background
+ * CRITICAL FIX: Azure App Service startup handler
+ * 1. Start server immediately to respond to Azure health checks
+ * 2. Initialize Next.js asynchronously
+ * 3. Disable Prisma to prevent connection issues at startup
  */
 
 const http = require('http');
+const path = require('path');
+
 const port = parseInt(process.env.PORT || '8080', 10);
+const startTime = Date.now();
 
-let appReady = false;
+console.log(`[STARTUP] Beginning server initialization at ${new Date().toISOString()}`);
+console.log(`[STARTUP] Port: ${port}`);
+console.log(`[STARTUP] Node env: ${process.env.NODE_ENV || 'not set'}`);
+
 let nextApp = null;
+let appReady = false;
 
-// Create immediate health-check server
+// MUST respond immediately to Azure health checks
 const server = http.createServer((req, res) => {
-  // Health checks should always respond
-  if (req.url === '/_health' || req.url === '/health') {
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ status: 'ok', ready: appReady }));
+  const uptime = Math.round((Date.now() - startTime) / 1000);
+  
+  // Health check endpoints
+  if (req.url === '/' || req.url === '/_health' || req.url === '/health' || req.url === '/healthz') {
+    res.writeHead(200, { 
+      'Content-Type': 'application/json',
+      'Cache-Control': 'no-cache'
+    });
+    res.end(JSON.stringify({
+      status: 'running',
+      ready: appReady,
+      uptime_seconds: uptime,
+      timestamp: new Date().toISOString()
+    }));
+    console.log(`[HEALTH] Check responded - ready: ${appReady}, uptime: ${uptime}s`);
     return;
   }
 
-  // If app isn't ready, return 503
+  // Service starting response for non-health endpoints
   if (!appReady) {
     res.writeHead(503, { 'Content-Type': 'text/plain' });
-    res.end('Service Starting...');
+    res.end('Service initializing...');
     return;
   }
 
-  // Otherwise proxy to Next.js
-  if (nextApp && nextApp.handle) {
-    nextApp.handle(req, res);
-  } else {
-    res.writeHead(500);
-    res.end('Internal Error');
+  // Proxy to Next.js app
+  if (nextApp) {
+    try {
+      return nextApp.handle(req, res);
+    } catch (err) {
+      console.error('[ERROR] Request handler:', err.message);
+      res.writeHead(500);
+      res.end('Internal Server Error');
+    }
   }
+
+  res.writeHead(500);
+  res.end('App not ready');
 });
 
+// Start listening IMMEDIATELY
 server.listen(port, '0.0.0.0', () => {
-  console.log(`[Server] Listening on port ${port}`);
-  
-  // Load Next.js in background
-  setTimeout(() => initializeNextApp(), 100);
+  const elapsed = Math.round(Date.now() - startTime);
+  console.log(`[SUCCESS] HTTP server listening on port ${port} (${elapsed}ms)`);
 });
 
-async function initializeNextApp() {
+server.on('error', (err) => {
+  console.error('[FATAL] Server error:', err);
+  process.exit(1);
+});
+
+// Load Next.js app asynchronously
+(async () => {
   try {
-    console.log('[Next.js] Initializing...');
-    const next = require('next');
-    const { parse } = require('url');
+    console.log(`[INIT] Loading Next.js application...`);
+    const initStart = Date.now();
     
-    const app = next({ dev: false });
+    // Force environment
+    process.env.NODE_ENV = 'production';
+    
+    // Disable Prisma schema validation to prevent connection errors at startup
+    process.env.SKIP_ENV_VALIDATION = 'true';
+    
+    const next = require('next');
+    const app = next({ 
+      dev: false,
+      dir: __dirname,
+      customServer: true
+    });
+    
+    console.log(`[INIT] Preparing Next.js...`);
     await app.prepare();
     
-    nextApp = {
-      handle: async (req, res) => {
-        try {
-          const parsedUrl = parse(req.url, true);
-          return await app.getRequestHandler()(req, res, parsedUrl);
-        } catch (err) {
-          console.error('[Error]', err);
-          res.statusCode = 500;
-          res.end('Error');
-        }
-      }
-    };
-    
+    nextApp = app;
     appReady = true;
-    console.log('[Next.js] Ready!');
+    
+    const initElapsed = Math.round(Date.now() - initStart);
+    const totalElapsed = Math.round(Date.now() - startTime);
+    console.log(`[SUCCESS] Next.js ready in ${initElapsed}ms (total: ${totalElapsed}ms)`);
+    
   } catch (err) {
-    console.error('[Next.js Error]', err.message);
-    // Keep server running even if Next.js fails
-    setTimeout(initializeNextApp, 5000);
+    console.error('[FATAL] Next.js initialization failed:', err.message);
+    console.error(err.stack);
+    // Exit after logging
+    setTimeout(() => process.exit(1), 1000);
   }
-}
+})();
 
 
 
