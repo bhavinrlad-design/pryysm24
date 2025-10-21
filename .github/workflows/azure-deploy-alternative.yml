@@ -1,11 +1,7 @@
 name: Deploy to Azure App Service (OpenID Connect)
 
 on:
-  push:
-    branches:
-      - main
-      - new-main
-  workflow_dispatch:
+  workflow_dispatch:  # Manual trigger only - OIDC not configured yet
 
 permissions:
   id-token: write

@@ -1,7 +1,11 @@
 name: Deploy to Azure (Service Principal - Legacy)
 
 on:
-  workflow_dispatch:  # Only manual trigger for now
+  push:
+    branches:
+      - main
+      - new-main
+  workflow_dispatch:
 
 permissions:
   contents: read
