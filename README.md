@@ -6,23 +6,37 @@ A starter Next.js app scaffold for managing 3D prints, printers, and materials.
 
 This application is configured for deployment to Microsoft Azure App Service.
 
-### Azure Credentials Setup (Publish Profile Method - RECOMMENDED)
+### Azure Credentials Setup (Azure CLI Method - RECOMMENDED)
 
-**This is the simplest and most reliable method for Azure deployment.**
+**This method uses Azure CLI for deployment and works even with basic authentication disabled.**
 
-1. **Download the Publish Profile**:
-   - Go to the Azure Portal: https://portal.azure.com
-   - Navigate to your App Service
-   - Click on **"Get publish profile"** in the top menu (or Overview page)
-   - This will download a `.PublishSettings` XML file
+1. **Create Service Principal and Get Credentials**:
+
+   ```bash
+   # Login to Azure
+   az login
+   
+   # Set your subscription if you have multiple
+   az account set --subscription "Your-Subscription-Name-Or-ID"
+   
+   # Create a service principal with contributor rights to your resource group
+   # AND format the output for GitHub Actions
+   az ad sp create-for-rbac --name "GitHub-Actions-Deploy" \
+     --role contributor \
+     --scopes /subscriptions/{YOUR-SUBSCRIPTION-ID}/resourceGroups/{YOUR-RESOURCE-GROUP} \
+     --sdk-auth
+   ```
+
+   This command will output a JSON object. Copy the **ENTIRE JSON OUTPUT**.
 
 2. **Add GitHub Secrets**:
    
    Go to your GitHub repository settings: https://github.com/lad-pryysm/pryysm-v2/settings/secrets/actions
 
    Create the following secrets:
-   - `AZURE_PUBLISH_PROFILE`: Open the downloaded `.PublishSettings` file in a text editor and copy the **ENTIRE CONTENTS** of the file
+   - `AZURE_CREDENTIALS`: The **ENTIRE JSON** output from the command above
    - `AZURE_APP_NAME`: Your Azure App Service name (e.g., "pryysm-web-app")
+   - `AZURE_RESOURCE_GROUP`: Your Azure Resource Group name
    - `DATABASE_URL`: Your database connection string
    - `NEXT_PUBLIC_API_URL`: Your app's public API endpoint (e.g., "https://pryysm-web-app.azurewebsites.net")
 
@@ -31,7 +45,7 @@ This application is configured for deployment to Microsoft Azure App Service.
    - Monitor the deployment in the GitHub Actions tab
    - The workflow file used is `.github/workflows/azure-deploy-alternative.yml`
 
-> **Note**: The main workflow (`azure-deploy.yml`) is currently disabled due to service principal authentication complexities. The publish profile method is simpler and more reliable for most use cases.
+> **Note**: This method works even if basic authentication is disabled on your Azure App Service (a common security setting).
 
 ---
 
