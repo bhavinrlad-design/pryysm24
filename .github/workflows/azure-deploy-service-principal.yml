@@ -29,7 +29,11 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: |
+          # Install with PRISMA_SKIP_POSTINSTALL to prevent client generation
+          npm install
+        env:
+          PRISMA_SKIP_POSTINSTALL: "true"
 
       - name: Create production env file
         run: |
@@ -49,6 +53,7 @@ jobs:
         env:
           NODE_ENV: production
           SKIP_ENV_VALIDATION: "true"
+          PRISMA_SKIP_POSTINSTALL: "true"
       
       - name: Azure Post-Build Tasks
         run: |
@@ -69,11 +74,12 @@ jobs:
           rm -rf .next/standalone/node_modules/@prisma 2>/dev/null || true
           rm -rf .next/standalone/node_modules/prisma 2>/dev/null || true
           
-          # Ensure server.js is included in the deployment
-          cp server.js .next/standalone/
-          # Copy Azure-specific configuration
-          cp next.config.azure.js .next/standalone/
-          # Copy web.config for IIS
+          # Remove any other unnecessary modules
+          rm -rf .next/standalone/node_modules/typescript 2>/dev/null || true
+          rm -rf .next/standalone/node_modules/eslint 2>/dev/null || true
+          
+          # Copy only index.js as the entry point
+          cp index.js .next/standalone/
           cp web.config .next/standalone/
           
           # Copy public assets if the directory exists

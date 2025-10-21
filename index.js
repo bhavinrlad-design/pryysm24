@@ -1,24 +1,68 @@
 #!/usr/bin/env node
 
 /**
- * Standalone server wrapper for Azure
- * Minimal initialization - just delegates to Next.js
+ * Azure App Service Entry Point
+ * Respond immediately, load Next.js async in background
  */
 
-process.env.NODE_ENV = 'production';
+const http = require('http');
+const port = process.env.PORT || 8080;
 
-const next = require('next');
-const app = next({ dev: false });
+console.log('[START] Initializing...');
 
-const handle = app.getRequestHandler();
+let ready = false;
+let nextApp = null;
 
-app.prepare().then(() => {
-  require('http').createServer(handle).listen(process.env.PORT || 8080, () => {
-    console.log(`Ready on http://localhost:${process.env.PORT || 8080}`);
-  });
-}).catch(err => {
-  console.error('Failed to start:', err);
+// Create server that responds immediately
+const server = http.createServer((req, res) => {
+  if (!ready) {
+    // Not ready yet - return 503
+    res.writeHead(503, { 'Content-Type': 'text/plain' });
+    res.end('Service Starting');
+    return;
+  }
+
+  // Ready - proxy to Next.js
+  try {
+    nextApp(req, res);
+  } catch (e) {
+    console.error('[ERROR]', e.message);
+    res.writeHead(500);
+    res.end('Error');
+  }
+});
+
+server.on('error', (err) => {
+  console.error('[FATAL]', err.message);
   process.exit(1);
+});
+
+// Start listening IMMEDIATELY
+server.listen(port, '0.0.0.0', () => {
+  console.log(`[LISTENING] Port ${port}`);
+});
+
+// Load Next.js in background - does NOT block
+setImmediate(async () => {
+  try {
+    console.log('[NEXT] Loading...');
+    const next = require('next');
+    
+    const app = next({ dev: false });
+    const handle = app.getRequestHandler();
+    
+    console.log('[NEXT] Preparing...');
+    await app.prepare();
+    
+    console.log('[NEXT] Ready!');
+    nextApp = handle;
+    ready = true;
+    
+  } catch (err) {
+    console.error('[NEXT_ERROR]', err.message);
+    console.error(err);
+    process.exit(1);
+  }
 });
 
 
