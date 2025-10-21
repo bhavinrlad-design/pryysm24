@@ -2,70 +2,44 @@
 
 const http = require('http');
 const url = require('url');
+const fs = require('fs');
+const path = require('path');
 const port = process.env.PORT || 8080;
 
-// Disable Next.js telemetry
 process.env.NEXT_TELEMETRY_DISABLED = '1';
 process.env.NODE_ENV = 'production';
 
-console.log(`[${Date.now()}] Server starting on port ${port}`);
+console.log(`[${Date.now()}] Starting...`);
 
-let ready = false;
-let handle = null;
+let server;
 
-// HTTP server - responds IMMEDIATELY
-const server = http.createServer((req, res) => {
+// Try to load from standalone first, fallback to regular build
+const isStandalone = fs.existsSync(path.join(__dirname, '.next', 'package.json'));
+console.log(`[${Date.now()}] Standalone: ${isStandalone}`);
+
+// Import server directly  - skips app.prepare()
+const next = require('next');
+const app = next({ dev: false, conf: { isExperimentalCompile: true } });
+const handle = app.getRequestHandler();
+
+// This is the key - we DON'T call app.prepare() beforehand
+// Just start responding to requests immediately
+server = http.createServer(async (req, res) => {
   const { pathname } = url.parse(req.url);
   
-  // Health check - ALWAYS respond, even during init
-  if (pathname === '/' || pathname === '/health' || pathname === '/_health') {
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ status: ready ? 'ok' : 'starting' }));
-    return;
-  }
-  
-  // Other requests need app to be ready
-  if (!ready) {
-    res.writeHead(503);
-    res.end('Starting');
-    return;
-  }
-  
   try {
-    handle(req, res).catch(() => {
-      res.writeHead(500).end('Error');
-    });
-  } catch (e) {
-    res.writeHead(500).end('Error');
+    await handle(req, res);
+  } catch (err) {
+    console.error('Error:', err.message);
+    if (!res.headersSent) {
+      res.writeHead(500);
+      res.end('Error');
+    }
   }
 });
 
 server.listen(port, '0.0.0.0', () => {
-  console.log(`[${Date.now()}] ✓ Listening on port ${port}`);
-});
-
-// Load Next.js asynchronously - CRITICAL for immediate response
-process.nextTick(async () => {
-  try {
-    const start = Date.now();
-    console.log(`[${Date.now()}] Loading Next.js...`);
-    
-    const next = require('next');
-    const app = next({ dev: false });
-    
-    console.log(`[${Date.now()}] Preparing...`);
-    await app.prepare();
-    
-    handle = app.getRequestHandler();
-    ready = true;
-    
-    const elapsed = Date.now() - start;
-    console.log(`[${Date.now()}] ✓ READY (${elapsed}ms)`);
-  } catch (err) {
-    console.error(`[${Date.now()}] ✗ FAILED:`, err.message);
-    console.error(err.stack);
-    process.exit(1);
-  }
+  console.log(`[${Date.now()}] ✓ Server ready on port ${port}`);
 });
 
 
