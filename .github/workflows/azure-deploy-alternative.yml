@@ -113,26 +113,41 @@ jobs:
       - name: Deploy to Azure App Service using Kudu API
         run: |
           # Extract deployment credentials from publish profile
-          # Parse the publish profile XML to get deployment credentials
           echo "${{ secrets.AZURE_PUBLISH_PROFILE }}" > publishprofile.xml
           
           # Extract username and password from publish profile (MSDeploy section)
           DEPLOY_USER=$(grep -oP 'userName="[^"]*"' publishprofile.xml | head -1 | sed 's/userName="\(.*\)"/\1/')
           DEPLOY_PASS=$(grep -oP 'userPWD="[^"]*"' publishprofile.xml | head -1 | sed 's/userPWD="\(.*\)"/\1/')
           
-          # Build the Kudu deployment URL from app name
-          APP_NAME="${{ secrets.AZURE_APP_NAME }}"
-          KUDU_URL="https://${APP_NAME}.scm.azurewebsites.net/api/zipdeploy"
+          # Extract the actual publish URL from the profile
+          PUBLISH_URL=$(grep -oP 'publishUrl="[^"]*\.scm\.azurewebsites\.net[^"]*"' publishprofile.xml | head -1 | sed 's/publishUrl="\(.*\)"/\1/')
           
+          # Remove any :443 port and construct the Kudu URL
+          KUDU_HOST=$(echo "$PUBLISH_URL" | sed 's/:443//')
+          KUDU_URL="https://${KUDU_HOST}/api/zipdeploy"
+          
+          echo "Extracted credentials successfully"
           echo "Deploying to: $KUDU_URL"
           
           # Deploy using Kudu API with basic auth
-          curl -X POST \
+          HTTP_CODE=$(curl -X POST \
             --user "$DEPLOY_USER:$DEPLOY_PASS" \
             --data-binary @deploy.zip \
             -H "Content-Type: application/zip" \
-            "$KUDU_URL"
+            -w "%{http_code}" \
+            -o deploy_response.txt \
+            "$KUDU_URL")
+          
+          echo "HTTP Response Code: $HTTP_CODE"
+          
+          if [ "$HTTP_CODE" -eq 200 ] || [ "$HTTP_CODE" -eq 202 ]; then
+            echo "Deployment successful!"
+          else
+            echo "Deployment failed with HTTP code: $HTTP_CODE"
+            cat deploy_response.txt
+            exit 1
+          fi
           
           # Clean up
-          rm publishprofile.xml
+          rm publishprofile.xml deploy_response.txt
           echo "Deployment completed!"
