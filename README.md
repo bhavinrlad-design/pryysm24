@@ -12,36 +12,41 @@ For GitHub Actions to deploy to Azure, you need to set up the following secrets 
 
 1. Go to your GitHub repository settings: https://github.com/lad-pryysm/pryysm-v2/settings/secrets/actions
 
-2. Add the following individual secrets:
+2. Create the service principal and get the required JSON credentials by running this Azure CLI command:
 
-   - `AZURE_CLIENT_ID`: Your Azure AD application/service principal client ID
-   - `AZURE_TENANT_ID`: Your Azure AD tenant ID
-   - `AZURE_SUBSCRIPTION_ID`: Your Azure subscription ID
-   - `AZURE_CLIENT_SECRET`: Your Azure AD application/service principal client secret (NOT the secret ID)
+```bash
+az ad sp create-for-rbac --name "pryysm-deploy" \
+    --role contributor \
+    --scopes /subscriptions/{subscription-id}/resourceGroups/{resource-group} \
+    --sdk-auth
+```
+
+Replace `{subscription-id}` and `{resource-group}` with your actual Azure subscription ID and resource group name.
+
+3. This command will output a JSON object like this:
+
+```json
+{
+  "clientId": "xxxx-xxxx-xxxx-xxxx-xxxx",
+  "clientSecret": "xxxx-xxxx-xxxx-xxxx-xxxx",
+  "subscriptionId": "xxxx-xxxx-xxxx-xxxx-xxxx",
+  "tenantId": "xxxx-xxxx-xxxx-xxxx-xxxx",
+  "activeDirectoryEndpointUrl": "https://login.microsoftonline.com",
+  "resourceManagerEndpointUrl": "https://management.azure.com/",
+  "activeDirectoryGraphResourceId": "https://graph.windows.net/",
+  "sqlManagementEndpointUrl": "https://management.core.windows.net:8443/",
+  "galleryEndpointUrl": "https://gallery.azure.com/",
+  "managementEndpointUrl": "https://management.core.windows.net/"
+}
+```
+
+4. Add this entire JSON object as a GitHub repository secret named `AZURE_CREDENTIALS`.
+
+5. Also add these additional required secrets:
    - `AZURE_APP_NAME`: Your Azure App Service name
    - `AZURE_RESOURCE_GROUP`: Your Azure Resource Group name
    - `DATABASE_URL`: Your database connection string
    - `NEXT_PUBLIC_API_URL`: Your app's public API endpoint
-
-3. To create a service principal with the correct credentials, run the following Azure CLI command:
-
-```bash
-az ad sp create-for-rbac --name "pryysm-deploy" --role contributor \
-  --scopes /subscriptions/{subscription-id}/resourceGroups/{resource-group}
-```
-
-This command will output JSON similar to:
-
-```json
-{
-  "appId": "YOUR_CLIENT_ID",
-  "displayName": "pryysm-deploy",
-  "password": "YOUR_CLIENT_SECRET",
-  "tenant": "YOUR_TENANT_ID"
-}
-```
-
-Use these individual values to create the GitHub secrets listed above. You'll also need your Azure subscription ID.
 
 ### Quick Start
 
