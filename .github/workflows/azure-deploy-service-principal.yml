@@ -78,8 +78,9 @@ jobs:
           rm -rf .next/standalone/node_modules/typescript 2>/dev/null || true
           rm -rf .next/standalone/node_modules/eslint 2>/dev/null || true
           
-          # Copy only index.js as the entry point
+          # Copy entry point files
           cp index.js .next/standalone/
+          cp server-simple.js .next/standalone/
           cp web.config .next/standalone/
           
           # Copy public assets if the directory exists
