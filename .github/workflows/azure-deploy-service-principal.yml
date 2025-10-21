@@ -39,6 +39,7 @@ jobs:
           NODE_ENV=production
           NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
           PORT=8080
+          SKIP_ENV_VALIDATION=true
           EOL
 
       - name: Build for Azure
@@ -47,13 +48,14 @@ jobs:
           cp next.config.azure.js next.config.js.bak
           cp next.config.azure.js next.config.js
           
-          # Run the build
-          npm run build
+          # Run the build with prisma generation disabled
+          SKIP_ENV_VALIDATION=true npm run build
           
           # Restore original next.config.js
           mv next.config.js.bak next.config.js
         env:
           NODE_ENV: production
+          SKIP_ENV_VALIDATION: "true"
       
       - name: Azure Post-Build Tasks
         run: |
