@@ -116,17 +116,22 @@ jobs:
           # Parse the publish profile XML to get deployment credentials
           echo "${{ secrets.AZURE_PUBLISH_PROFILE }}" > publishprofile.xml
           
-          # Extract username and password from publish profile
-          DEPLOY_USER=$(grep -oP 'userName="[^"]*"' publishprofile.xml | head -1 | cut -d'"' -f2)
-          DEPLOY_PASS=$(grep -oP 'userPWD="[^"]*"' publishprofile.xml | head -1 | cut -d'"' -f2)
-          DEPLOY_URL=$(grep -oP 'publishUrl="[^"]*"' publishprofile.xml | head -1 | cut -d'"' -f2)
+          # Extract username and password from publish profile (MSDeploy section)
+          DEPLOY_USER=$(grep -oP 'userName="[^"]*"' publishprofile.xml | head -1 | sed 's/userName="\(.*\)"/\1/')
+          DEPLOY_PASS=$(grep -oP 'userPWD="[^"]*"' publishprofile.xml | head -1 | sed 's/userPWD="\(.*\)"/\1/')
           
-          # Deploy using Kudu API
+          # Build the Kudu deployment URL from app name
+          APP_NAME="${{ secrets.AZURE_APP_NAME }}"
+          KUDU_URL="https://${APP_NAME}.scm.azurewebsites.net/api/zipdeploy"
+          
+          echo "Deploying to: $KUDU_URL"
+          
+          # Deploy using Kudu API with basic auth
           curl -X POST \
-            -u "$DEPLOY_USER:$DEPLOY_PASS" \
+            --user "$DEPLOY_USER:$DEPLOY_PASS" \
             --data-binary @deploy.zip \
             -H "Content-Type: application/zip" \
-            "https://$DEPLOY_URL/api/zipdeploy"
+            "$KUDU_URL"
           
           # Clean up
           rm publishprofile.xml
