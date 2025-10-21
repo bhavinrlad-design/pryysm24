@@ -4,48 +4,96 @@ A starter Next.js app scaffold for managing 3D prints, printers, and materials.
 
 ## Azure Deployment
 
-This application is configured for deployment to Microsoft Azure App Service.
+This application is configured for deployment to Microsoft Azure App Service using **OpenID Connect (OIDC)** - Microsoft's recommended authentication method.
 
-### Azure Credentials Setup (Azure CLI Method - RECOMMENDED)
+### Azure Setup with OpenID Connect (OIDC) - RECOMMENDED
 
-**This method uses Azure CLI for deployment and works even with basic authentication disabled.**
+**This method uses OpenID Connect for secure, token-based authentication without storing long-lived credentials.**
 
-1. **Create Service Principal and Get Credentials**:
+#### 1. Create Microsoft Entra Application and Service Principal
 
-   ```bash
-   # Login to Azure
-   az login
-   
-   # Set your subscription if you have multiple
-   az account set --subscription "Your-Subscription-Name-Or-ID"
-   
-   # Create a service principal with contributor rights to your resource group
-   # AND format the output for GitHub Actions
-   az ad sp create-for-rbac --name "GitHub-Actions-Deploy" \
-     --role contributor \
-     --scopes /subscriptions/{YOUR-SUBSCRIPTION-ID}/resourceGroups/{YOUR-RESOURCE-GROUP} \
-     --sdk-auth
-   ```
+Run these commands in Azure CLI:
 
-   This command will output a JSON object. Copy the **ENTIRE JSON OUTPUT**.
+```bash
+# Login to Azure
+az login
 
-2. **Add GitHub Secrets**:
-   
-   Go to your GitHub repository settings: https://github.com/lad-pryysm/pryysm-v2/settings/secrets/actions
+# Set your subscription if you have multiple
+az account set --subscription "Your-Subscription-Name-Or-ID"
 
-   Create the following secrets:
-   - `AZURE_CREDENTIALS`: The **ENTIRE JSON** output from the command above
-   - `AZURE_APP_NAME`: Your Azure App Service name (e.g., "pryysm-web-app")
-   - `AZURE_RESOURCE_GROUP`: Your Azure Resource Group name
-   - `DATABASE_URL`: Your database connection string
-   - `NEXT_PUBLIC_API_URL`: Your app's public API endpoint (e.g., "https://pryysm-web-app.azurewebsites.net")
+# 1. Create the Microsoft Entra application
+az ad app create --display-name "GitHub-Actions-Pryysm"
+# Copy the 'appId' from the output - you'll use this as AZURE_CLIENT_ID
 
-3. **Deploy**:
-   - Push to the `new-main` branch to trigger automatic deployment
-   - Monitor the deployment in the GitHub Actions tab
-   - The workflow file used is `.github/workflows/azure-deploy-alternative.yml`
+# 2. Create a service principal (replace $appId with your appId from step 1)
+az ad sp create --id $appId
+# Copy the 'appOwnerTenantId' from output - you'll use this as AZURE_TENANT_ID
 
-> **Note**: This method works even if basic authentication is disabled on your Azure App Service (a common security setting).
+# 3. Get your subscription ID
+az account show --query id -o tsv
+# Copy this - you'll use it as AZURE_SUBSCRIPTION_ID
+
+# 4. Create role assignment (replace with your actual values)
+az role assignment create \
+  --role contributor \
+  --subscription {YOUR-SUBSCRIPTION-ID} \
+  --assignee-object-id {ASSIGNEE-OBJECT-ID-FROM-STEP-2} \
+  --scope /subscriptions/{YOUR-SUBSCRIPTION-ID}/resourceGroups/{YOUR-RESOURCE-GROUP}/providers/Microsoft.Web/sites/{YOUR-WEBAPP-NAME} \
+  --assignee-principal-type ServicePrincipal
+
+# 5. Create federated credential
+# First, create a file called credential.json with this content:
+cat > credential.json << EOF
+{
+    "name": "GitHubActionsCredential",
+    "issuer": "https://token.actions.githubusercontent.com",
+    "subject": "repo:lad-pryysm/pryysm-v2:ref:refs/heads/new-main",
+    "description": "GitHub Actions OIDC for pryysm-v2",
+    "audiences": [
+        "api://AzureADTokenExchange"
+    ]
+}
+EOF
+
+# Then create the federated credential (replace with your app's object ID)
+az ad app federated-credential create --id {APP-OBJECT-ID} --parameters credential.json
+```
+
+#### 2. Add GitHub Secrets
+
+Go to your GitHub repository settings: https://github.com/lad-pryysm/pryysm-v2/settings/secrets/actions
+
+Create the following secrets:
+
+| Secret Name | Description | Where to Find |
+|------------|-------------|---------------|
+| `AZURE_CLIENT_ID` | Application (client) ID | Output from step 1 (appId) |
+| `AZURE_TENANT_ID` | Directory (tenant) ID | Output from step 2 (appOwnerTenantId) |
+| `AZURE_SUBSCRIPTION_ID` | Your Azure subscription ID | Output from step 3 |
+| `AZURE_APP_NAME` | Your Azure App Service name | Your Azure portal |
+| `DATABASE_URL` | PostgreSQL connection string | Your database settings |
+| `NEXT_PUBLIC_API_URL` | Public API URL | `https://{AZURE_APP_NAME}.azurewebsites.net` |
+
+#### 3. Deploy
+
+- Push to the `new-main` branch to trigger automatic deployment
+- Monitor the deployment in the GitHub Actions tab
+- The workflow file used is `.github/workflows/azure-deploy-alternative.yml`
+
+### Why OpenID Connect (OIDC)?
+
+✅ **More Secure**: Uses short-lived tokens instead of long-lived credentials  
+✅ **Microsoft Recommended**: Official best practice for GitHub Actions + Azure  
+✅ **No Secret Rotation**: Federated credentials don't expire  
+✅ **Better Compliance**: Meets modern security standards  
+✅ **Works with Basic Auth Disabled**: Compatible with secure Azure configurations  
+
+### Troubleshooting
+
+- **Permissions Error**: Verify the service principal has Contributor role on your App Service
+- **Authentication Failed**: Check that federated credential subject matches: `repo:lad-pryysm/pryysm-v2:ref:refs/heads/new-main`
+- **Deployment Fails**: Ensure all GitHub secrets are correctly set
+- **Build Issues**: Check GitHub Actions logs for specific error messages
 
 ---
 

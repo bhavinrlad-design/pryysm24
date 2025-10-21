@@ -1,4 +1,4 @@
-name: Deploy to Azure App Service (Publish Profile)
+name: Deploy to Azure App Service (OpenID Connect)
 
 on:
   push:
@@ -6,6 +6,14 @@ on:
       - main
       - new-main
   workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AZURE_WEBAPP_NAME: ${{ secrets.AZURE_APP_NAME }}
+  NODE_VERSION: '20'
 
 jobs:
   build-and-deploy:
@@ -18,9 +26,8 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20'
-          # Temporarily disable npm cache to avoid initial setup issues
-          # cache: 'npm'
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm install
@@ -102,35 +109,22 @@ jobs:
             echo "Warning: .next/static directory not found."
           fi
 
-      # Install Azure CLI
-      - name: Install Azure CLI
-        run: |
-          curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-          
-      # Login to Azure
+      # Login to Azure using OpenID Connect (OIDC)
       - name: Login to Azure
-        uses: azure/login@v1
+        uses: azure/login@v2
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           
-      # Create a deployment package
-      - name: Create deployment package
-        run: |
-          cd .next/standalone
-          zip -r ../../deploy.zip .
-          cd ../..
+      # Deploy to Azure Web App using the official action
+      - name: Deploy to Azure App Service
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          package: .next/standalone
           
-      # Deploy using Azure CLI
-      - name: Deploy to Azure App Service using Azure CLI
-        run: |
-          echo "Starting deployment with Azure CLI..."
-          
-          # Deploy the ZIP file using Azure CLI
-          az webapp deployment source config-zip \
-            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-            --name ${{ secrets.AZURE_APP_NAME }} \
-            --src deploy.zip \
-            --timeout 300
-          
-          echo "✓ Deployment completed successfully!"
-          echo "Your app should be available at: https://${{ secrets.AZURE_APP_NAME }}.azurewebsites.net"
+      # Logout from Azure
+      - name: Logout from Azure
+        run: az logout
+        if: always()
