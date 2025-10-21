@@ -8,7 +8,12 @@ const path = require('path');
 const port = parseInt(process.env.PORT, 10) || 8080;
 const isDev = process.env.NODE_ENV !== 'production';
 
-console.log(`[${new Date().toISOString()}] Starting Next.js server on port ${port}`);
+const now = () => new Date().toISOString();
+
+console.log(`[${now()}] STARTUP: Starting Next.js server on port ${port}`);
+console.log(`[${now()}] STARTUP: Node version: ${process.version}`);
+console.log(`[${now()}] STARTUP: CWD: ${process.cwd()}`);
+console.log(`[${now()}] STARTUP: .next exists: ${fs.existsSync('.next')}`);
 
 let nextApp;
 let handle;
@@ -16,32 +21,40 @@ let ready = false;
 
 const prepareNext = async () => {
   try {
-    console.log(`[${new Date().toISOString()}] Loading Next.js...`);
+    console.log(`[${now()}] PREPARE: Starting app.prepare()`);
+    const prepareStart = Date.now();
     
-    // Import next after ensuring we're in production mode
     process.env.NODE_ENV = 'production';
     const next = require('next');
     
+    console.log(`[${now()}] PREPARE: Creating next app`);
     nextApp = next({ dev: false });
     
-    console.log(`[${new Date().toISOString()}] Calling prepare()...`);
-    await nextApp.prepare();
+    console.log(`[${now()}] PREPARE: Calling app.prepare()...`);
+    const result = await nextApp.prepare();
+    
+    const prepareTime = Date.now() - prepareStart;
+    console.log(`[${now()}] PREPARE: Completed in ${prepareTime}ms, result: ${result}`);
     
     handle = nextApp.getRequestHandler();
     ready = true;
     
-    console.log(`[${new Date().toISOString()}] Ready!`);
+    console.log(`[${now()}] READY: App is ready!`);
   } catch (err) {
-    console.error(`[${new Date().toISOString()}] Error preparing app:`, err);
+    console.error(`[${now()}] ERROR: Failed to prepare:`, err.message);
+    console.error(err.stack);
     process.exit(1);
   }
 };
 
 const server = createServer((req, res) => {
   const parsedUrl = parse(req.url, true);
+  const method = req.method;
+  const url = req.url;
+  
+  console.log(`[${now()}] REQUEST: ${method} ${url} - ready: ${ready}`);
   
   if (!ready) {
-    // Service starting response
     res.writeHead(503, { 'Content-Type': 'text/plain' });
     res.end('Service Starting');
     return;
@@ -50,15 +63,23 @@ const server = createServer((req, res) => {
   try {
     handle(req, res);
   } catch (err) {
-    console.error(`Error handling request:`, err);
-    res.writeHead(500);
-    res.end('Internal Error');
+    console.error(`[${now()}] ERROR handling request:`, err.message);
+    if (!res.headersSent) {
+      res.writeHead(500);
+      res.end('Internal Error');
+    }
   }
 });
 
-server.listen(port, '0.0.0.0', () => {
-  console.log(`[${new Date().toISOString()}] Server listening on port ${port}`);
+server.on('error', (err) => {
+  console.error(`[${now()}] SERVER ERROR:`, err.message);
+  process.exit(1);
 });
 
-// Start preparing app in the background
+server.listen(port, '0.0.0.0', () => {
+  console.log(`[${now()}] LISTEN: Server listening on port ${port}`);
+});
+
+// Start preparing app immediately
+console.log(`[${now()}] SETUP: Scheduling app.prepare()`);
 setImmediate(prepareNext);
