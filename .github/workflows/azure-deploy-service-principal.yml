@@ -72,6 +72,10 @@ jobs:
             mkdir -p .next/standalone
           fi
           
+          # CRITICAL: Remove Prisma from standalone to prevent database connection at startup
+          rm -rf .next/standalone/node_modules/@prisma 2>/dev/null || true
+          rm -rf .next/standalone/node_modules/prisma 2>/dev/null || true
+          
           # Ensure server.js is included in the deployment
           cp server.js .next/standalone/
           # Copy Azure-specific configuration
