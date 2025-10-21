@@ -140,7 +140,7 @@ jobs:
           echo "Your app should be available at: https://${{ secrets.AZURE_APP_NAME }}.azurewebsites.net"
       
       # Configure App Startup
-      - name: Configure App Startup
+      - name: Configure App Startup  
         run: |
           echo "Configuring app settings..."
           
@@ -149,6 +149,12 @@ jobs:
             --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
             --name ${{ secrets.AZURE_APP_NAME }} \
             --startup-file "node index.js"
+          
+          # Set health check path using app settings
+          az webapp config appsettings set \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --name ${{ secrets.AZURE_APP_NAME }} \
+            --settings WEBSITE_HEALTHCHECK_MAXPINGFAILURES=10 WEBSITE_HEALTHCHECK_PATH=/health
           
           echo "✓ App configured!"
           

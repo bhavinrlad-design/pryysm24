@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 
 /**
- * Lazy-load Next.js: Start server immediately, load Next.js on first request
+ * Health check endpoint returns immediately, app loads lazily on first real request
  */
 
 const { createServer } = require('http');
+const url = require('url');
 
 const port = parseInt(process.env.PORT, 10) || 8080;
 const now = () => new Date().toISOString();
@@ -42,13 +43,23 @@ const loadNext = () => {
 };
 
 const server = createServer(async (req, res) => {
+  const parsedUrl = url.parse(req.url, true);
+  
   try {
-    // Load Next.js if not already loaded
+    // HEALTH CHECK: Always respond immediately
+    if (parsedUrl.pathname === '/health' || parsedUrl.pathname === '/_health') {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ status: 'ok', ready: !!handle }));
+      return;
+    }
+    
+    // LAZY LOAD: Load Next.js if not already loaded
     if (!handle) {
+      console.log(`[${now()}] REQUEST: First request, loading Next.js...`);
       await loadNext();
     }
     
-    // Handle the request
+    // HANDLE REQUEST: Proxy to Next.js
     if (handle) {
       handle(req, res);
     } else {
