@@ -44,15 +44,8 @@ jobs:
 
       - name: Build for Azure
         run: |
-          # Create a copy of azure config as next.config.js temporarily
-          cp next.config.azure.js next.config.js.bak
-          cp next.config.azure.js next.config.js
-          
-          # Run the build with prisma generation disabled
-          SKIP_ENV_VALIDATION=true npm run build
-          
-          # Restore original next.config.js
-          mv next.config.js.bak next.config.js
+          # Run the build with standalone output
+          npm run build
         env:
           NODE_ENV: production
           SKIP_ENV_VALIDATION: "true"
