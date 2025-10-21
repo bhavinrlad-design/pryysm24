@@ -41,9 +41,6 @@ jobs:
           PORT=8080
           EOL
 
-      - name: Run Prisma generate
-        run: npx prisma generate
-        
       - name: Build for Azure
         run: |
           # Create a copy of azure config as next.config.js temporarily
