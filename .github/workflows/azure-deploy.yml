@@ -74,8 +74,23 @@ jobs:
           cp next.config.azure.js .next/standalone/
           # Copy web.config for IIS
           cp web.config .next/standalone/
-          # Copy public assets
-          cp -r public .next/standalone/
+          
+          # Copy public assets if the directory exists
+          if [ -d "public" ]; then
+            echo "Copying public directory..."
+            cp -r public .next/standalone/
+          else
+            echo "Note: public directory does not exist, creating empty one."
+            mkdir -p .next/standalone/public
+          fi
+          
+          # Copy app directory assets if they exist (for images, etc.)
+          if [ -d "app" ]; then
+            echo "Copying app directory for assets..."
+            mkdir -p .next/standalone/app
+            # Only copy asset files, not code
+            find app -type f -name "*.png" -o -name "*.jpg" -o -name "*.jpeg" -o -name "*.svg" -o -name "*.ico" -o -name "*.gif" | xargs -I{} cp --parents {} .next/standalone/
+          fi
           
           # Create .next directory inside standalone if it doesn't exist
           mkdir -p .next/standalone/.next
