@@ -1,40 +1,62 @@
 #!/usr/bin/env node
 
 /**
- * ABSOLUTE MINIMAL: NO app.prepare() - use standalone .next directly
+ * Lazy-load Next.js: Start server immediately, load Next.js on first request
  */
 
 const { createServer } = require('http');
-const { parse } = require('url');
 
 const port = parseInt(process.env.PORT, 10) || 8080;
 const now = () => new Date().toISOString();
 
-console.log(`[${now()}] STARTUP: Port ${port}`);
+console.log(`[${now()}] STARTUP: Starting server on port ${port}`);
 
 let handle;
+let loadingPromise = null;
 
-// Load Next.js WITHOUT calling prepare()
-try {
-  console.log(`[${now()}] LOAD: Requiring next...`);
-  const next = require('next');
-  const app = next({ dev: false });
+// Lazy load Next.js on first request
+const loadNext = () => {
+  if (loadingPromise) return loadingPromise;
   
-  console.log(`[${now()}] LOAD: Getting handler...`);
-  handle = app.getRequestHandler();
+  console.log(`[${now()}] LOAD: Starting Next.js load...`);
+  loadingPromise = (async () => {
+    try {
+      console.log(`[${now()}] LOAD: Requiring next module...`);
+      const next = require('next');
+      
+      console.log(`[${now()}] LOAD: Creating app...`);
+      const app = next({ dev: false });
+      
+      console.log(`[${now()}] LOAD: Getting handler...`);
+      handle = app.getRequestHandler();
+      
+      console.log(`[${now()}] LOAD: Complete`);
+      return true;
+    } catch (err) {
+      console.error(`[${now()}] ERROR loading Next.js:`, err.message);
+      throw err;
+    }
+  })();
   
-  console.log(`[${now()}] LOAD: SUCCESS - Handler ready`);
-} catch (err) {
-  console.error(`[${now()}] ERROR: Failed to load:`, err.message);
-  process.exit(1);
-}
+  return loadingPromise;
+};
 
-// Create and start server IMMEDIATELY
-const server = createServer((req, res) => {
+const server = createServer(async (req, res) => {
   try {
-    handle(req, res);
+    // Load Next.js if not already loaded
+    if (!handle) {
+      await loadNext();
+    }
+    
+    // Handle the request
+    if (handle) {
+      handle(req, res);
+    } else {
+      res.writeHead(500);
+      res.end('Not ready');
+    }
   } catch (err) {
-    console.error(`[${now()}] ERR:`, err.message);
+    console.error(`[${now()}] ERROR:`, err.message);
     if (!res.headersSent) {
       res.writeHead(500);
       res.end('Error');
@@ -43,7 +65,7 @@ const server = createServer((req, res) => {
 });
 
 server.listen(port, '0.0.0.0', () => {
-  console.log(`[${now()}] READY: Listening on ${port}`);
+  console.log(`[${now()}] READY: Listening on port ${port}`);
 });
 
 server.on('error', (err) => {

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-// TEMPORARY TEST: Use dumb server to verify HTTP works
-require('./test-server.js');
+// Entry point for Azure App Service
+require('./server-simple.js');
 
 
 
