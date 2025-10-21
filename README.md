@@ -12,41 +12,19 @@ For GitHub Actions to deploy to Azure, you need to set up the following secrets 
 
 1. Go to your GitHub repository settings: https://github.com/lad-pryysm/pryysm-v2/settings/secrets/actions
 
-2. Create the service principal and get the required JSON credentials by running this Azure CLI command:
+2. Get your Azure Publish Profile:
+   - Go to the Azure Portal: https://portal.azure.com
+   - Navigate to your App Service
+   - Click on "Get publish profile" in the Overview page
+   - This will download a file with XML content
 
-```bash
-az ad sp create-for-rbac --name "pryysm-deploy" \
-    --role contributor \
-    --scopes /subscriptions/{subscription-id}/resourceGroups/{resource-group} \
-    --sdk-auth
-```
-
-Replace `{subscription-id}` and `{resource-group}` with your actual Azure subscription ID and resource group name.
-
-3. This command will output a JSON object like this:
-
-```json
-{
-  "clientId": "xxxx-xxxx-xxxx-xxxx-xxxx",
-  "clientSecret": "xxxx-xxxx-xxxx-xxxx-xxxx",
-  "subscriptionId": "xxxx-xxxx-xxxx-xxxx-xxxx",
-  "tenantId": "xxxx-xxxx-xxxx-xxxx-xxxx",
-  "activeDirectoryEndpointUrl": "https://login.microsoftonline.com",
-  "resourceManagerEndpointUrl": "https://management.azure.com/",
-  "activeDirectoryGraphResourceId": "https://graph.windows.net/",
-  "sqlManagementEndpointUrl": "https://management.core.windows.net:8443/",
-  "galleryEndpointUrl": "https://gallery.azure.com/",
-  "managementEndpointUrl": "https://management.core.windows.net/"
-}
-```
-
-4. Add this entire JSON object as a GitHub repository secret named `AZURE_CREDENTIALS`.
-
-5. Also add these additional required secrets:
+3. Create the following GitHub repository secrets:
+   - `AZURE_PUBLISH_PROFILE`: The entire XML content from the downloaded publish profile file
    - `AZURE_APP_NAME`: Your Azure App Service name
-   - `AZURE_RESOURCE_GROUP`: Your Azure Resource Group name
    - `DATABASE_URL`: Your database connection string
    - `NEXT_PUBLIC_API_URL`: Your app's public API endpoint
+
+This approach uses the publish profile for authentication, which is simpler and more reliable than service principal authentication.
 
 ### Quick Start
 
