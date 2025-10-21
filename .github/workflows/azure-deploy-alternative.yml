@@ -115,19 +115,41 @@ jobs:
           # Extract deployment credentials from publish profile
           echo "${{ secrets.AZURE_PUBLISH_PROFILE }}" > publishprofile.xml
           
+          # Debug: Show the publish profile structure (without sensitive data)
+          echo "Analyzing publish profile..."
+          grep "publishUrl" publishprofile.xml | head -3
+          
           # Extract username and password from publish profile (MSDeploy section)
-          DEPLOY_USER=$(grep -oP 'userName="[^"]*"' publishprofile.xml | head -1 | sed 's/userName="\(.*\)"/\1/')
-          DEPLOY_PASS=$(grep -oP 'userPWD="[^"]*"' publishprofile.xml | head -1 | sed 's/userPWD="\(.*\)"/\1/')
+          DEPLOY_USER=$(grep 'publishMethod="MSDeploy"' publishprofile.xml -A 5 | grep -oP 'userName="[^"]*"' | head -1 | cut -d'"' -f2)
+          DEPLOY_PASS=$(grep 'publishMethod="MSDeploy"' publishprofile.xml -A 5 | grep -oP 'userPWD="[^"]*"' | head -1 | cut -d'"' -f2)
           
-          # Extract the actual publish URL from the profile
-          PUBLISH_URL=$(grep -oP 'publishUrl="[^"]*\.scm\.azurewebsites\.net[^"]*"' publishprofile.xml | head -1 | sed 's/publishUrl="\(.*\)"/\1/')
+          # Extract the publish URL - look for the MSDeploy publishUrl
+          PUBLISH_URL=$(grep 'publishMethod="MSDeploy"' publishprofile.xml -A 5 | grep -oP 'publishUrl="[^"]*"' | head -1 | cut -d'"' -f2)
           
-          # Remove any :443 port and construct the Kudu URL
-          KUDU_HOST=$(echo "$PUBLISH_URL" | sed 's/:443//')
-          KUDU_URL="https://${KUDU_HOST}/api/zipdeploy"
+          # If MSDeploy URL not found, try ZipDeploy
+          if [ -z "$PUBLISH_URL" ]; then
+            PUBLISH_URL=$(grep 'publishMethod="ZipDeploy"' publishprofile.xml -A 5 | grep -oP 'publishUrl="[^"]*"' | head -1 | cut -d'"' -f2)
+          fi
+          
+          echo "Found publish URL: $PUBLISH_URL"
+          
+          # Extract the hostname and construct Kudu URL
+          if [[ $PUBLISH_URL =~ ^https?://([^/:]+) ]]; then
+            KUDU_HOST="${BASH_REMATCH[1]}"
+            KUDU_URL="https://${KUDU_HOST}/api/zipdeploy"
+          else
+            echo "ERROR: Could not extract hostname from publish URL"
+            exit 1
+          fi
           
           echo "Extracted credentials successfully"
           echo "Deploying to: $KUDU_URL"
+          
+          # Verify credentials are not empty
+          if [ -z "$DEPLOY_USER" ] || [ -z "$DEPLOY_PASS" ]; then
+            echo "ERROR: Could not extract credentials from publish profile"
+            exit 1
+          fi
           
           # Deploy using Kudu API with basic auth
           HTTP_CODE=$(curl -X POST \
