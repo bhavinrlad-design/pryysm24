@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main  # Set a branch name to trigger deployment
+      - new-main  # Also trigger deployment from new-main branch
   workflow_dispatch:  # Allow manual triggering
 
 jobs:
