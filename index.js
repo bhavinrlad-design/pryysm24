@@ -1,51 +1,50 @@
 #!/usr/bin/env node
 
 /**
- * Simple Next.js standalone server starter for Azure
- * This is used instead of the complex server.js to ensure compatibility
+ * Minimal Next.js server for Azure App Service
+ * This avoids any database initialization on startup
  */
 
 const { createServer } = require('http');
 const { parse } = require('url');
 const next = require('next');
 
-// Configuration
 const dev = process.env.NODE_ENV !== 'production';
 const port = parseInt(process.env.PORT || '8080', 10);
 const hostname = '0.0.0.0';
 
-console.log(`[${new Date().toISOString()}] Starting Next.js server`);
-console.log(`[${new Date().toISOString()}] Mode: ${dev ? 'development' : 'production'}`);
-console.log(`[${new Date().toISOString()}] Port: ${port}`);
+console.log(`[STARTUP] Initializing Next.js server (${dev ? 'dev' : 'prod'})`);
 
-// Create Next.js app
-const app = next({ dev });
+const app = next({ dev, conf: {} });
 const handle = app.getRequestHandler();
-
-// Prepare the app - this might take time on first startup
-console.log(`[${new Date().toISOString()}] Preparing Next.js app...`);
 
 app.prepare()
   .then(() => {
     createServer((req, res) => {
-      try {
-        const parsedUrl = parse(req.url, true);
-        handle(req, res, parsedUrl);
-      } catch (err) {
-        console.error('[ERROR] Request handler error:', err);
-        res.statusCode = 500;
-        res.end('Internal server error');
+      // Health check endpoint
+      if (req.url === '/_health' || req.url === '/health') {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ status: 'healthy', timestamp: new Date().toISOString() }));
+        return;
       }
+
+      const parsedUrl = parse(req.url, true);
+      handle(req, res, parsedUrl).catch(err => {
+        console.error('[ERROR]', err);
+        res.statusCode = 500;
+        res.end('Internal Server Error');
+      });
     }).listen(port, hostname, (err) => {
       if (err) {
-        console.error('[ERROR] Server startup error:', err);
+        console.error('[ERROR] Failed to start server:', err);
         process.exit(1);
       }
-      console.log(`[${new Date().toISOString()}] ✓ Server ready on http://${hostname}:${port}`);
+      console.log(`[SUCCESS] Server listening on ${hostname}:${port}`);
     });
   })
-  .catch((err) => {
-    console.error('[ERROR] App preparation failed:', err);
+  .catch(err => {
+    console.error('[ERROR] Failed to prepare app:', err);
     process.exit(1);
   });
+
 
