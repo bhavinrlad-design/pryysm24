@@ -2,8 +2,6 @@
 
 const http = require('http');
 const url = require('url');
-const fs = require('fs');
-const path = require('path');
 const port = process.env.PORT || 8080;
 
 process.env.NEXT_TELEMETRY_DISABLED = '1';
@@ -11,21 +9,16 @@ process.env.NODE_ENV = 'production';
 
 console.log(`[${Date.now()}] Starting...`);
 
-let server;
+let ready = false;
+let handle = null;
 
-// Try to load from standalone first, fallback to regular build
-const isStandalone = fs.existsSync(path.join(__dirname, '.next', 'package.json'));
-console.log(`[${Date.now()}] Standalone: ${isStandalone}`);
-
-// Import server directly  - skips app.prepare()
-const next = require('next');
-const app = next({ dev: false, conf: { isExperimentalCompile: true } });
-const handle = app.getRequestHandler();
-
-// This is the key - we DON'T call app.prepare() beforehand
-// Just start responding to requests immediately
-server = http.createServer(async (req, res) => {
-  const { pathname } = url.parse(req.url);
+// Create HTTP server that responds immediately
+const server = http.createServer(async (req, res) => {
+  if (!ready) {
+    res.writeHead(503);
+    res.end('Service Starting');
+    return;
+  }
   
   try {
     await handle(req, res);
@@ -39,7 +32,27 @@ server = http.createServer(async (req, res) => {
 });
 
 server.listen(port, '0.0.0.0', () => {
-  console.log(`[${Date.now()}] ✓ Server ready on port ${port}`);
+  console.log(`[${Date.now()}] ✓ Listening on port ${port}`);
+});
+
+// Initialize Next.js in background - CRITICAL
+setImmediate(async () => {
+  try {
+    console.log(`[${Date.now()}] Initializing Next.js...`);
+    const next = require('next');
+    const app = next({ dev: false });
+    
+    console.log(`[${Date.now()}] Preparing...`);
+    await app.prepare();
+    
+    handle = app.getRequestHandler();
+    ready = true;
+    console.log(`[${Date.now()}] ✓ READY`);
+  } catch (err) {
+    console.error(`[${Date.now()}] ERROR:`, err.message);
+    console.error(err);
+    process.exit(1);
+  }
 });
 
 
