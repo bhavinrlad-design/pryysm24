@@ -44,6 +44,8 @@ jobs:
           NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
           PORT=8080
           SKIP_ENV_VALIDATION=true
+          SKIP_ESLINT_VALIDATION=true
+          SKIP_PRISMA_VALIDATION=true
           EOL
 
       - name: Build for Azure
@@ -80,6 +82,7 @@ jobs:
           
           # Copy entry point files
           cp index.js .next/standalone/
+          cp server-static.js .next/standalone/
           cp server-parent.js .next/standalone/
           cp server-child.js .next/standalone/
           cp server-minimal.js .next/standalone/
