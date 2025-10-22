@@ -82,7 +82,7 @@ jobs:
           
           # Copy entry point files
           cp index.js .next/standalone/
-          cp startup.sh .next/standalone/
+          cp startup.js .next/standalone/
           cp server-static.js .next/standalone/
           
           # Copy public assets if the directory exists
@@ -145,11 +145,11 @@ jobs:
         run: |
           echo "Configuring app settings..."
           
-          # Set startup command - use background shell script
+          # Set startup command - use Node wrapper that exits immediately
           az webapp config set \
             --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
             --name ${{ secrets.AZURE_APP_NAME }} \
-            --startup-file "bash startup.sh" \
+            --startup-file "node startup.js" \
             --remote-debugging-enabled false
           
           # Set environment variables and disable health check to allow startup
