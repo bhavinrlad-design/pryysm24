@@ -91,11 +91,8 @@ jobs:
           # Check size
           du -sh .next/standalone/node_modules | head -1
           
-          # Copy entry point files
-          cp index.js .next/standalone/
-          cp server-sync.js .next/standalone/
-          cp server-ultimate.js .next/standalone/
-          cp server-parallel.js .next/standalone/
+          # Copy entry point files (use Next.js's native server.js)
+          cp index-nextjs.js .next/standalone/index.js
           cp web.config .next/standalone/
           
           echo "✓ Build prep complete"
