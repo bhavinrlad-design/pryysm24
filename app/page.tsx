@@ -2,314 +2,209 @@
 'use client';
 
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, Layers, Workflow, Calculator, BarChart3, FileText, GanttChartSquare, Zap, Shield, ArrowRight, Rocket, Cpu } from "lucide-react";
+import { Calculator, CheckCircle2, GanttChartSquare, Layers, Workflow, Cpu, FileText } from "lucide-react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
+
 export default function LandingPage() {
+
   return (
-    <div className="flex flex-col min-h-screen bg-white text-gray-900">
-      {/* Top Gradient Bar */}
-      <div style={{
-        background: 'linear-gradient(to right, #004B8D, #E6A635)',
-        height: '4px',
-      }}></div>
-
-      {/* Header/Navigation */}
-      <header className="sticky top-0 z-50 w-full bg-white border-b border-gray-100 shadow-sm">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          {/* Logo */}
-          <Link href="/" className="font-bold text-xl text-gray-900">
-            PRYYSM
+    <div className="flex flex-col min-h-screen bg-white text-gray-800">
+      <header className="px-4 lg:px-6 h-16 flex items-center shadow-sm sticky top-0 z-50 bg-white/80 backdrop-blur-sm">
+        <Link href="#" className="flex items-center justify-center" prefetch={false}>
+          <Layers className="h-8 w-8 text-yellow-500" />
+          <span className="ml-2 text-xl font-bold text-primary">
+            Pryysm <span className="text-sm font-medium text-gray-500">by 3D Prodigy</span>
+          </span>
+        </Link>
+        <nav className="ml-auto flex gap-4 sm:gap-6 items-center">
+          <Link href="#features" className="text-sm font-medium hover:text-primary" prefetch={false}>
+            Features
           </Link>
-          
-          {/* Nav Links */}
-          <nav className="hidden md:flex items-center gap-8">
-            <Link href="#features" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
-              Features
+          <Link href="#contact" className="text-sm font-medium hover:text-primary" prefetch={false}>
+            Contact
+          </Link>
+          <Button asChild variant="secondary">
+            <Link href="https://calendly.com/bhavin-lad-3d-prodigy/pryysm-demo" target="_blank" rel="noopener noreferrer">
+              Book Demo
             </Link>
-            <Link href="#benefits" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
-              Benefits
-            </Link>
-            <Link href="#pricing" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
-              Pricing
-            </Link>
-            <Link href="#contact" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
-              Contact
-            </Link>
-          </nav>
-
-          {/* CTA Buttons */}
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" className="hidden sm:inline-flex text-sm text-gray-600 hover:text-gray-900">
-              <Link href="/login">Sign In</Link>
-            </Button>
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-              <Link href="https://calendly.com/bhavin-lad-3d-prodigy/pryysm-demo" target="_blank" rel="noopener noreferrer">
-                Get Started
-              </Link>
-            </Button>
-          </div>
-        </div>
+          </Button>
+          <Button asChild>
+            <Link href="/login">Login</Link>
+          </Button>
+        </nav>
       </header>
 
-      <main className="flex-1 w-full">
+      <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative w-full py-20 md:py-32 lg:py-40 bg-gradient-to-br from-white via-blue-50/20 to-white">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div className="flex flex-col items-center text-center space-y-6 max-w-4xl mx-auto">
-              {/* Badge */}
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-200">
-                <Zap className="h-4 w-4 text-blue-600" />
-                <span className="text-sm font-medium text-blue-900">
-                  Next-Gen 3D Printing OS
-                </span>
-              </div>
-
-              {/* Main Headline */}
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-tight text-gray-900">
-                Transform Your 3D Printing Operation
+        <section className="w-full pt-24 pb-32 md:pt-32 md:pb-40 text-center overflow-hidden bg-white">
+          <div className="container px-4 md:px-6 relative z-10">
+            <div className="flex flex-col items-center space-y-6">
+              <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl leading-snug bg-clip-text text-transparent bg-gradient-to-br from-gray-900 via-primary to-accent mb-6 pb-2">
+                Revolutionize Your 3D Printing Operation
               </h1>
 
-              {/* Subheading */}
-              <p className="text-lg sm:text-lg text-gray-600 max-w-2xl leading-relaxed font-normal">
-                All-in-one platform for scheduling, tracking, costing, and scaling your 3D printing farm with AI-powered insights.
+              <p className="max-w-[700px] text-gray-600 md:text-xl mx-auto">
+                Pryysm is the all-in-one, intelligent platform designed to bring clarity, efficiency, and powerful automation to your 3D printing farm.
               </p>
-
-              {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row items-center gap-4 pt-4">
-                <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-6 text-base font-semibold">
-                  <Link href="https://calendly.com/bhavin-lad-3d-prodigy/pryysm-demo" target="_blank" rel="noopener noreferrer">
-                    Book Demo
-                  </Link>
-                </Button>
-                <Button variant="outline" size="lg" className="border-gray-300 hover:bg-gray-50 px-8 py-6 text-base font-semibold text-gray-900">
-                  <Link href="/login">
-                    Try Free
-                  </Link>
-                </Button>
-              </div>
-
-              {/* Trust indicators */}
-              <div className="flex flex-col sm:flex-row items-center gap-6 pt-4 text-sm text-gray-600">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0" />
-                  <span className="font-medium">No credit card</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0" />
-                  <span className="font-medium">14-day trial</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0" />
-                  <span className="font-medium">24/7 support</span>
-                </div>
-              </div>
             </div>
           </div>
         </section>
 
         {/* Features Section */}
-        <section id="features" className="relative w-full py-20 md:py-28 bg-white">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            {/* Section Header */}
-            <div className="flex flex-col items-center text-center max-w-3xl mx-auto mb-16 md:mb-20">
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-4 text-gray-900">
-                Core Features
-              </h2>
-              <p className="text-lg text-gray-600 font-normal leading-relaxed">
-                Everything you need to optimize and scale your operations.
+        <section id="features" className="w-full py-12 md:py-24 lg:py-32 bg-gray-50">
+          <div className="container px-4 md:px-6">
+            <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl text-gray-900">A Smarter Way to Print</h2>
+              <p className="max-w-[900px] text-gray-600 md:text-xl/relaxed">
+                From intelligent scheduling to complete financial oversight, Pryysm is the unified OS your 3D printing farm needs to scale efficiently.
               </p>
             </div>
-
-            {/* Feature Grid */}
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {/* Feature 1 */}
-              <Card className="group hover:shadow-lg transition-all duration-300 border border-gray-200 hover:border-gray-300 bg-white rounded-xl overflow-hidden">
-                <CardHeader className="pb-3">
-                  <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center mb-4">
-                    <Cpu className="h-5 w-5 text-blue-600" />
+            <div className="mx-auto grid max-w-5xl items-start gap-8 sm:grid-cols-1 md:gap-12 lg:max-w-none lg:grid-cols-3">        
+              {/* Feature 1: AI Scheduling */}
+              <Card className="flex flex-col">
+                <CardHeader>
+                  <div className="flex items-center gap-4">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+                      <Cpu className="h-6 w-6 text-primary" />
+                    </div>
+                    <CardTitle>AI-Powered Scheduling</CardTitle>
                   </div>
-                  <CardTitle className="text-lg font-semibold text-gray-900">Smart Scheduling</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    Intelligent algorithms optimize job placement and maximize printer utilization.
+                <CardContent className="flex-1">
+                  <p className="text-muted-foreground">
+                    Our intelligent AI scheduler analyzes your entire fleet, job requirements, and deadlines to find the absolute optimal production plan.
                   </p>
+                  <ul className="mt-4 space-y-3 text-sm">
+                    <li className="flex items-start gap-3">
+                      <CheckCircle2 className="h-5 w-5 mt-0.5 text-primary flex-shrink-0" />
+                      <span>Automatically find the most efficient slot for any job.</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <CheckCircle2 className="h-5 w-5 mt-0.5 text-primary flex-shrink-0" />
+                      <span>Maximize printer utilization and reduce idle time.</span>
+                    </li>
+                  </ul>
                 </CardContent>
               </Card>
 
-              {/* Feature 2 */}
-              <Card className="group hover:shadow-lg transition-all duration-300 border border-gray-200 hover:border-gray-300 bg-white rounded-xl overflow-hidden">
-                <CardHeader className="pb-3">
-                  <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center mb-4">
-                    <Workflow className="h-5 w-5 text-amber-600" />
+              {/* Feature 2: Visual Workflow */}
+              <Card className="flex flex-col">
+                <CardHeader>
+                  <div className="flex items-center gap-4">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+                      <Workflow className="h-6 w-6 text-primary" />
+                    </div>
+                    <CardTitle>Visual Project Tracking</CardTitle>
                   </div>
-                  <CardTitle className="text-lg font-semibold text-gray-900">Project Tracking</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    Real-time dashboards with complete visibility into every project and job status.
+                <CardContent className="flex-1">
+                  <p className="text-muted-foreground">
+                    Ditch confusing spreadsheets. Our intuitive Kanban-style board gives you a complete visual overview of every project in your pipeline.
                   </p>
+                  <ul className="mt-4 space-y-3 text-sm">
+                    <li className="flex items-start gap-3">
+                      <CheckCircle2 className="h-5 w-5 mt-0.5 text-primary flex-shrink-0" />
+                      <span>Track projects from order to dispatch in one view.</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <CheckCircle2 className="h-5 w-5 mt-0.5 text-primary flex-shrink-0" />
+                      <span>Get instant insights into bottlenecks and resource allocation.</span>
+                    </li>
+                  </ul>
                 </CardContent>
               </Card>
 
-              {/* Feature 3 */}
-              <Card className="group hover:shadow-lg transition-all duration-300 border border-gray-200 hover:border-gray-300 bg-white rounded-xl overflow-hidden">
-                <CardHeader className="pb-3">
-                  <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center mb-4">
-                    <Calculator className="h-5 w-5 text-green-600" />
+              {/* Feature 3: Financial Hub */}
+              <Card className="flex flex-col">
+                <CardHeader>
+                  <div className="flex items-center gap-4">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+                      <FileText className="h-6 w-6 text-primary" />
+                    </div>
+                    <CardTitle>Integrated Financial Hub</CardTitle>
                   </div>
-                  <CardTitle className="text-lg font-semibold text-gray-900">Smart Costing</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    Automatic cost calculations with material tracking and real-time profit analysis.
+                <CardContent className="flex-1">
+                  <p className="text-muted-foreground">
+                    From precise job costing to professional invoicing, Pryysm integrates your finances directly into your workflow to ensure profitability.
                   </p>
-                </CardContent>
-              </Card>
-
-              {/* Feature 4 */}
-              <Card className="group hover:shadow-lg transition-all duration-300 border border-gray-200 hover:border-gray-300 bg-white rounded-xl overflow-hidden">
-                <CardHeader className="pb-3">
-                  <div className="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center mb-4">
-                    <BarChart3 className="h-5 w-5 text-red-600" />
-                  </div>
-                  <CardTitle className="text-lg font-semibold text-gray-900">Analytics</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    Comprehensive dashboards and reports for production metrics and business intelligence.
-                  </p>
-                </CardContent>
-              </Card>
-
-              {/* Feature 5 */}
-              <Card className="group hover:shadow-lg transition-all duration-300 border border-gray-200 hover:border-gray-300 bg-white rounded-xl overflow-hidden">
-                <CardHeader className="pb-3">
-                  <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center mb-4">
-                    <FileText className="h-5 w-5 text-purple-600" />
-                  </div>
-                  <CardTitle className="text-lg font-semibold text-gray-900">Documents</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    Auto-generated invoices, quotations, shipping labels, and complete order documentation.
-                  </p>
-                </CardContent>
-              </Card>
-
-              {/* Feature 6 */}
-              <Card className="group hover:shadow-lg transition-all duration-300 border border-gray-200 hover:border-gray-300 bg-white rounded-xl overflow-hidden">
-                <CardHeader className="pb-3">
-                  <div className="w-10 h-10 rounded-lg bg-cyan-100 flex items-center justify-center mb-4">
-                    <GanttChartSquare className="h-5 w-5 text-cyan-600" />
-                  </div>
-                  <CardTitle className="text-lg font-semibold text-gray-900">Planning</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    Bank-grade security with role-based access, audit logs, and compliance certifications.
-                  </p>
+                  <ul className="mt-4 space-y-3 text-sm">
+                    <li className="flex items-start gap-3">
+                      <CheckCircle2 className="h-5 w-5 mt-0.5 text-primary flex-shrink-0" />
+                      <span>Calculate exact job costs, including materials and labor.</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <CheckCircle2 className="h-5 w-5 mt-0.5 text-primary flex-shrink-0" />
+                      <span>Generate and send professional quotes and invoices in minutes.</span>
+                    </li>
+                  </ul>
                 </CardContent>
               </Card>
             </div>
           </div>
         </section>
 
-        {/* Stats Section */}
-        <section className="relative w-full py-16 md:py-24 bg-gray-50">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-              <div className="text-center">
-                <div className="text-3xl sm:text-4xl font-bold text-blue-600 mb-2">47%</div>
-                <p className="text-gray-600 text-sm">Productivity increase</p>
+        {/* Core Pillars Section */}
+        <section className="w-full py-12 md:py-24 lg:py-32 bg-white">
+          <div className="container px-4 md:px-6">
+            <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl text-gray-900">The Unified Platform for Manufacturing</h2>
+            </div>
+            <div className="mx-auto grid max-w-5xl items-start gap-8 sm:grid-cols-2 md:gap-12 lg:max-w-none lg:grid-cols-3">        
+              <div className="grid gap-2 p-6 rounded-lg hover:bg-gray-100 transition-colors">
+                <Workflow className="h-8 w-8 text-primary" />
+                <h3 className="text-lg font-bold">Total Workflow Control</h3>
+                <p className="text-sm text-gray-600">Manage your entire production pipeline visually. Track every project from order to dispatch on an intuitive Kanban board and eliminate operational blind spots.</p>
               </div>
-              <div className="text-center">
-                <div className="text-3xl sm:text-4xl font-bold text-blue-600 mb-2">3.2x</div>
-                <p className="text-gray-600 text-sm">Faster scheduling</p>
+              <div className="grid gap-2 p-6 rounded-lg hover:bg-gray-100 transition-colors">
+                <GanttChartSquare className="h-8 w-8 text-primary" />
+                <h3 className="text-lg font-bold">Intelligent Resource Planning</h3>
+                <p className="text-sm text-gray-600">Leverage AI to automate scheduling, maximize printer uptime, and receive intelligent reorder alerts for materials before you run out. Turn your farm into a self-optimizing ecosystem.</p>
               </div>
-              <div className="text-center">
-                <div className="text-3xl sm:text-4xl font-bold text-blue-600 mb-2">89%</div>
-                <p className="text-gray-600 text-sm">Cost reduction</p>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl sm:text-4xl font-bold text-blue-600 mb-2">5min</div>
-                <p className="text-gray-600 text-sm">Setup time</p>
+              <div className="grid gap-2 p-6 rounded-lg hover:bg-gray-100 transition-colors">
+                <Calculator className="h-8 w-8 text-primary" />
+                <h3 className="text-lg font-bold">Integrated Financial Hub</h3>
+                <p className="text-sm text-gray-600">From precise job costing that ensures profitability to generating professional quotations and invoices, manage all your finances without leaving the platform.</p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* CTA Section */}
-        <section id="contact" className="relative w-full py-20 md:py-28 bg-blue-600 text-white">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6">Ready to get started?</h2>
-            <p className="text-lg text-blue-100 mb-8 max-w-2xl mx-auto">
-              Transform your 3D printing operation with PRYYSM today.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-6 text-base font-semibold">
-                <Link href="https://calendly.com/bhavin-lad-3d-prodigy/pryysm-demo">
-                  Schedule Demo
-                </Link>
-              </Button>
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-blue-700 px-8 py-6 text-base font-semibold">
-                <Link href="/login">
-                  Start Free Trial
-                </Link>
-              </Button>
-            </div>
-          </div>
-        </section>
       </main>
-
-      {/* Footer */}
-      <footer className="w-full bg-gray-900 text-gray-300 py-12 md:py-16">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            {/* Brand */}
+      <footer id="contact" className="bg-gray-100 text-gray-600 py-12">
+        <div className="container grid grid-cols-2 md:grid-cols-4 gap-8">
             <div>
-              <h3 className="font-bold text-white text-lg mb-4">PRYYSM</h3>
-              <p className="text-sm leading-relaxed">
-                The all-in-one platform for 3D printing farm operations.
-              </p>
+                <h3 className="font-semibold text-gray-900 mb-4">Pryysm <span className="text-xs font-medium text-gray-500">by 3D Prodigy</span></h3>
+                <p className="text-sm">The OS for Digital Manufacturing.</p>
             </div>
-            {/* Product */}
+             <div>
+                <h3 className="font-semibold text-gray-900 mb-4">Product</h3>
+                 <ul className="space-y-2 text-sm">
+                    <li><Link href="#features" className="hover:text-gray-900">Features</Link></li>
+                </ul>
+            </div>
             <div>
-              <h4 className="font-semibold text-white mb-4">Product</h4>
-              <ul className="space-y-2 text-sm">
-                <li><Link href="#features" className="hover:text-white transition">Features</Link></li>
-                <li><Link href="#" className="hover:text-white transition">Pricing</Link></li>
-                <li><Link href="#" className="hover:text-white transition">Roadmap</Link></li>
-              </ul>
+                <h3 className="font-semibold text-gray-900 mb-4">Company</h3>
+                 <ul className="space-y-2 text-sm">
+                    <li><Link href="#" className="hover:text-gray-900">About Us</Link></li>
+                    <li><Link href="#" className="hover:text-gray-900">Careers</Link></li>
+                    <li><Link href="#" className="hover:text-gray-900">Contact</Link></li>
+                </ul>
             </div>
-            {/* Company */}
-            <div>
-              <h4 className="font-semibold text-white mb-4">Company</h4>
-              <ul className="space-y-2 text-sm">
-                <li><Link href="#" className="hover:text-white transition">About</Link></li>
-                <li><Link href="#" className="hover:text-white transition">Blog</Link></li>
-                <li><Link href="#" className="hover:text-white transition">Careers</Link></li>
-              </ul>
+             <div>
+                <h3 className="font-semibold text-gray-900 mb-4">Legal</h3>
+                 <ul className="space-y-2 text-sm">
+                    <li><Link href="#" className="hover:text-gray-900">Terms of Service</Link></li>
+                    <li><Link href="#" className="hover:text-gray-900">Privacy Policy</Link></li>
+                </ul>
             </div>
-            {/* Legal */}
-            <div>
-              <h4 className="font-semibold text-white mb-4">Legal</h4>
-              <ul className="space-y-2 text-sm">
-                <li><Link href="#" className="hover:text-white transition">Privacy</Link></li>
-                <li><Link href="#" className="hover:text-white transition">Terms</Link></li>
-                <li><Link href="#" className="hover:text-white transition">Contact</Link></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-gray-800 pt-8">
-            <p className="text-center text-sm">
-              © 2025 PRYYSM by 3D Prodigy. All rights reserved.
-            </p>
-          </div>
+        </div>
+        <div className="container mt-12 pt-8 border-t border-gray-200 text-center text-sm">
+             &copy; {new Date().getFullYear()} Pryysm by 3D Prodigy. All rights reserved.
         </div>
       </footer>
     </div>
-  );
+  )
 }
