@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 // Entry point for Azure App Service
-require('./server-simple.js');
+require('./server-minimal.js');
 
 
 
