@@ -4,7 +4,7 @@
 
 import { Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
-import { PaymentClient } from "@/components/payment/payment-client";
+import { PaymentClient } from "@/components/payment/payment-client-simple";
 
 function PaymentContent() {
   return <PaymentClient />;
