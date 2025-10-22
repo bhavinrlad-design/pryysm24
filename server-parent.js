@@ -52,13 +52,22 @@ function spawnNextJs() {
   }
 
   // Handle child exit
-  nextProcess.on('exit', (code) => {
-    console.log(`[${now()}] PARENT: Child process exited with code ${code}`);
+  nextProcess.on('exit', (code, signal) => {
+    console.error(`[${now()}] PARENT: ❌ Child process exited! Code: ${code}, Signal: ${signal}`);
     nextReady = false;
+    
+    // Try to restart child after 5 seconds
+    console.log(`[${now()}] PARENT: Will attempt restart in 5 seconds...`);
+    setTimeout(() => {
+      if (!nextProcess || nextProcess.killed) {
+        console.log(`[${now()}] PARENT: Restarting child process...`);
+        spawnNextJs();
+      }
+    }, 5000);
   });
 
   nextProcess.on('error', (err) => {
-    console.error(`[${now()}] PARENT: Failed to spawn child:`, err.message);
+    console.error(`[${now()}] PARENT: ❌ Failed to spawn child:`, err.message);
   });
 }
 
@@ -86,14 +95,18 @@ async function checkNextPort() {
 
 // Periodically check if Next.js is ready
 async function watchNextJs() {
+  let checkCount = 0;
   while (true) {
     await new Promise(resolve => setTimeout(resolve, 2000));
     
     if (!nextReady) {
+      checkCount++;
       const ready = await checkNextPort();
       if (ready) {
         nextReady = true;
-        console.log(`[${now()}] PARENT: Next.js is ready!`);
+        console.log(`[${now()}] PARENT: ✓ Next.js is ready! (after ${checkCount * 2}s)`);
+      } else if (checkCount % 10 === 0) {
+        console.log(`[${now()}] PARENT: Still waiting for Next.js (${checkCount * 2}s elapsed)...`);
       }
     }
   }
