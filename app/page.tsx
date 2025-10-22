@@ -359,6 +359,151 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
+
+        {/* Testimonials Section */}
+        <section className="relative w-full py-24 md:py-36 lg:py-48 bg-white">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col items-center text-center max-w-2xl mx-auto mb-20">
+              <h2 className="text-4xl sm:text-5xl font-bold tracking-tight mb-6">
+                <span className="bg-gradient-to-r from-slate-900 to-primary bg-clip-text text-transparent">
+                  Loved by 3D Printing Professionals
+                </span>
+              </h2>
+              <p className="text-lg text-slate-600 font-light">
+                See what industry leaders are saying about Pryysm
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8">
+              {/* Testimonial 1 */}
+              <Card className="rounded-2xl border-slate-200">
+                <CardContent className="pt-8">
+                  <div className="flex items-center gap-1 mb-4">
+                    {[...Array(5)].map((_, i) => (
+                      <span key={i} className="text-accent text-xl">★</span>
+                    ))}
+                  </div>
+                  <p className="text-slate-600 mb-6 font-light leading-relaxed">
+                    "Pryysm has transformed how we manage our farm. Scheduling is now 3x faster and costs are 40% lower. Absolutely incredible."
+                  </p>
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold">
+                      JP
+                    </div>
+                    <div>
+                      <p className="font-semibold text-slate-900">James Patterson</p>
+                      <p className="text-sm text-slate-500">3D Farm Ops Manager</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Testimonial 2 */}
+              <Card className="rounded-2xl border-slate-200">
+                <CardContent className="pt-8">
+                  <div className="flex items-center gap-1 mb-4">
+                    {[...Array(5)].map((_, i) => (
+                      <span key={i} className="text-accent text-xl">★</span>
+                    ))}
+                  </div>
+                  <p className="text-slate-600 mb-6 font-light leading-relaxed">
+                    "The AI scheduling is mind-blowing. It optimizes jobs better than our team ever could. We increased throughput by 47%."
+                  </p>
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-white font-bold">
+                      SK
+                    </div>
+                    <div>
+                      <p className="font-semibold text-slate-900">Sarah Kumar</p>
+                      <p className="text-sm text-slate-500">Printing Solutions CEO</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Testimonial 3 */}
+              <Card className="rounded-2xl border-slate-200">
+                <CardContent className="pt-8">
+                  <div className="flex items-center gap-1 mb-4">
+                    {[...Array(5)].map((_, i) => (
+                      <span key={i} className="text-accent text-xl">★</span>
+                    ))}
+                  </div>
+                  <p className="text-slate-600 mb-6 font-light leading-relaxed">
+                    "Dashboard visibility is unmatched. Our team now has complete real-time insight into every printer and job. Game changer."
+                  </p>
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold">
+                      MC
+                    </div>
+                    <div>
+                      <p className="font-semibold text-slate-900">Mike Chen</p>
+                      <p className="text-sm text-slate-500">Manufacturing Director</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ Section */}
+        <section className="relative w-full py-24 md:py-36 lg:py-48 bg-gradient-to-b from-slate-50 to-white">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col items-center text-center max-w-2xl mx-auto mb-20">
+              <h2 className="text-4xl sm:text-5xl font-bold tracking-tight mb-6">
+                <span className="bg-gradient-to-r from-slate-900 to-primary bg-clip-text text-transparent">
+                  Frequently Asked Questions
+                </span>
+              </h2>
+              <p className="text-lg text-slate-600 font-light">
+                Everything you need to know about Pryysm
+              </p>
+            </div>
+
+            <div className="grid gap-8 max-w-3xl mx-auto">
+              {[
+                {
+                  q: "How long does it take to set up Pryysm?",
+                  a: "Most users have Pryysm fully set up and running within 5 minutes. No complex configuration required."
+                },
+                {
+                  q: "Is my data secure?",
+                  a: "Yes, we use bank-grade encryption, regular security audits, and comply with GDPR and SOC 2 standards."
+                },
+                {
+                  q: "Can I try Pryysm before purchasing?",
+                  a: "Absolutely! We offer a 14-day free trial with full access to all features. No credit card required."
+                },
+                {
+                  q: "What support options are available?",
+                  a: "We offer email, chat, and phone support. Premium plans include a dedicated success manager."
+                },
+                {
+                  q: "Can Pryysm integrate with our existing tools?",
+                  a: "Yes, Pryysm has APIs and integrations for most common 3D printing tools and business software."
+                },
+                {
+                  q: "What payment methods do you accept?",
+                  a: "We accept all major credit cards, bank transfers, and wire transfers for enterprise plans."
+                }
+              ].map((item, index) => (
+                <Card key={index} className="rounded-xl border-slate-200 hover:border-primary/30 hover:shadow-md transition-all">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-lg font-semibold text-slate-900">
+                      {item.q}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-slate-600 font-light leading-relaxed">
+                      {item.a}
+                    </p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
       </main>
 
       {/* Footer */}
