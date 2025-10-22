@@ -66,12 +66,30 @@ jobs:
             exit 1
           fi
           
-          # Remove heavy dependencies that slow startup
+          echo "Pruning unnecessary node_modules to speed up startup..."
+          
+          # Remove EVERYTHING that isn't needed at runtime
           rm -rf .next/standalone/node_modules/@prisma 2>/dev/null || true
           rm -rf .next/standalone/node_modules/prisma 2>/dev/null || true
           rm -rf .next/standalone/node_modules/typescript 2>/dev/null || true
           rm -rf .next/standalone/node_modules/eslint 2>/dev/null || true
           rm -rf .next/standalone/node_modules/@types 2>/dev/null || true
+          rm -rf .next/standalone/node_modules/@typescript-eslint 2>/dev/null || true
+          rm -rf .next/standalone/node_modules/prettier 2>/dev/null || true
+          rm -rf .next/standalone/node_modules/ts-node 2>/dev/null || true
+          rm -rf .next/standalone/node_modules/@babel 2>/dev/null || true
+          rm -rf .next/standalone/node_modules/webpack 2>/dev/null || true
+          rm -rf .next/standalone/node_modules/babel-loader 2>/dev/null || true
+          rm -rf .next/standalone/node_modules/react-devtools 2>/dev/null || true
+          
+          # Remove docs, tests, examples from all modules
+          find .next/standalone/node_modules -type d \( -name 'test' -o -name 'tests' -o -name 'docs' -o -name 'examples' -o -name '.github' \) -exec rm -rf {} + 2>/dev/null || true
+          
+          # Remove markdown, source maps, and other non-essential files
+          find .next/standalone/node_modules -type f \( -name '*.md' -o -name '*.map' -o -name '*.test.js' -o -name '*.spec.js' -o -name 'LICENSE' -o -name 'CHANGELOG*' \) -delete 2>/dev/null || true
+          
+          # Check size
+          du -sh .next/standalone/node_modules | head -1
           
           # Copy entry point files
           cp index.js .next/standalone/

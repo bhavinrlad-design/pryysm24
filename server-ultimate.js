@@ -50,6 +50,30 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // First real request (not health check) - load Next.js
+  if (!nextLoading) {
+    console.log(`[${now()}] First request at ${pathname} - loading Next.js...`);
+    nextLoading = true;
+    
+    (async () => {
+      try {
+        const loadStart = Date.now();
+        console.log(`[${now()}] Loading Next.js module...`);
+        const next = require('next');
+        
+        const loadTime = Math.floor((Date.now() - loadStart) / 1000);
+        console.log(`[${now()}] Next.js module loaded (${loadTime}s)`);
+        
+        const app = next({ dev: false });
+        nextHandler = app.getRequestHandler();
+        console.log(`[${now()}] ✓ Next.js ready!`);
+      } catch (err) {
+        console.error(`[${now()}] ❌ Failed to load Next.js:`, err.message);
+        nextLoading = false;
+      }
+    })();
+  }
+
   // Still loading - return holding page
   res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
   res.end(`<!DOCTYPE html>
@@ -57,7 +81,7 @@ const server = http.createServer((req, res) => {
 <head><title>Starting</title><meta http-equiv="refresh" content="3"></head>
 <body style="font-family:sans-serif;text-align:center;padding:100px">
 <h1>⏳ Application Initializing</h1>
-<p>Next.js is loading in the background...</p>
+<p>Next.js is loading...</p>
 <p><small>Auto-refresh in 3 seconds</small></p>
 </body>
 </html>`);
@@ -76,28 +100,7 @@ server.on('error', (err) => {
 
 // NOW load Next.js asynchronously in background
 // This will take 60-100+ seconds but won't block the server
-console.log(`[${now()}] Starting async Next.js load...`);
+console.log(`[${now()}] Ready for requests. Next.js will load on first request.`);
 
-setImmediate(async () => {
-  try {
-    const loadStart = Date.now();
-    console.log(`[${now()}] Loading Next.js module...`);
-    
-    // This is the slow part - but it happens in background
-    const next = require('next');
-    
-    const loadTime = Math.floor((Date.now() - loadStart) / 1000);
-    console.log(`[${now()}] Next.js module loaded (${loadTime}s)`);
-    
-    console.log(`[${now()}] Creating Next.js app...`);
-    const app = next({ dev: false });
-    
-    nextHandler = app.getRequestHandler();
-    console.log(`[${now()}] ✓ Next.js ready!`);
-    console.log(`[${now()}] Total startup time: ${Math.floor((Date.now() - startTime) / 1000)}s`);
-  } catch (err) {
-    console.error(`[${now()}] ❌ Failed to load Next.js:`, err.message);
-    console.error(err.stack);
-    nextLoading = false;
-  }
-});
+// DON'T load Next.js immediately - wait for first real request
+// This keeps startup time minimal
