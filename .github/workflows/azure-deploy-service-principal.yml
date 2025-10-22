@@ -50,7 +50,7 @@ jobs:
 
       - name: Build for Azure
         run: |
-          # Run the build with standalone output
+          # Run the build with STATIC export output
           npm run build
         env:
           NODE_ENV: production
@@ -59,58 +59,27 @@ jobs:
       
       - name: Azure Post-Build Tasks
         run: |
-          echo "Running Azure post-build tasks..."
-          # Check if .next directory exists
-          if [ ! -d ".next" ]; then
-            echo "Error: .next directory does not exist. Build may have failed."
+          echo "Running Azure post-build tasks for static export..."
+          
+          # Check if out directory exists (static export output)
+          if [ ! -d "out" ]; then
+            echo "Error: 'out' directory does not exist. Build may have failed or app uses wrong output mode."
             exit 1
           fi
           
-          # Check if standalone directory exists, create if not
-          if [ ! -d ".next/standalone" ]; then
-            echo "Creating missing standalone directory..."
-            mkdir -p .next/standalone
-          fi
+          echo "Copying deployment files..."
+          # Copy entry point files to root
+          cp index.js out/
+          cp server-export.js out/
+          cp web.config out/
           
-          # CRITICAL: Remove Prisma from standalone to prevent database connection at startup
-          rm -rf .next/standalone/node_modules/@prisma 2>/dev/null || true
-          rm -rf .next/standalone/node_modules/prisma 2>/dev/null || true
-          
-          # Remove any other unnecessary modules
-          rm -rf .next/standalone/node_modules/typescript 2>/dev/null || true
-          rm -rf .next/standalone/node_modules/eslint 2>/dev/null || true
-          
-          # Copy entry point files
-          cp index.js .next/standalone/
-          cp startup.js .next/standalone/
-          cp server-static.js .next/standalone/
-          
-          # Copy public assets if the directory exists
+          # Copy public assets if they exist
           if [ -d "public" ]; then
             echo "Copying public directory..."
-            cp -r public .next/standalone/
-          else
-            echo "Note: public directory does not exist, creating empty one."
-            mkdir -p .next/standalone/public
+            cp -r public/* out/ 2>/dev/null || true
           fi
           
-          # Copy app directory assets if they exist (for images, etc.)
-          if [ -d "app" ]; then
-            echo "Copying app directory for assets..."
-            mkdir -p .next/standalone/app
-            # Only copy asset files, not code
-            find app -type f -name "*.png" -o -name "*.jpg" -o -name "*.jpeg" -o -name "*.svg" -o -name "*.ico" -o -name "*.gif" | xargs -I{} cp --parents {} .next/standalone/
-          fi
-          
-          # Create .next directory inside standalone if it doesn't exist
-          mkdir -p .next/standalone/.next
-          
-          # Copy static assets if they exist
-          if [ -d ".next/static" ]; then
-            cp -r .next/static .next/standalone/.next/
-          else
-            echo "Warning: .next/static directory not found."
-          fi
+          echo "✓ Build preparation complete"
 
       # Login to Azure using Service Principal (Legacy method)
       - name: Login to Azure
@@ -121,10 +90,10 @@ jobs:
       # Create a deployment package
       - name: Create deployment package
         run: |
-          cd .next/standalone
+          cd out
           zip -r ../../deploy.zip .
           cd ../..
-          
+          echo "Deployment package created"
       # Deploy using Azure CLI
       - name: Deploy to Azure App Service using Azure CLI
         run: |
@@ -145,11 +114,11 @@ jobs:
         run: |
           echo "Configuring app settings..."
           
-          # Set startup command - use Node wrapper that exits immediately
+          # Set startup command
           az webapp config set \
             --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
             --name ${{ secrets.AZURE_APP_NAME }} \
-            --startup-file "node startup.js" \
+            --startup-file "node index.js" \
             --remote-debugging-enabled false
           
           # Set environment variables and disable health check to allow startup
