@@ -155,7 +155,7 @@ jobs:
           az webapp config appsettings set \
             --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
             --name ${{ secrets.AZURE_APP_NAME }} \
-            --settings NODE_ENV=production
+            --settings NODE_ENV=production NODE_OPTIONS="--max-old-space-size=256 --no-warnings"
           
           echo "✓ App configured!"
           
