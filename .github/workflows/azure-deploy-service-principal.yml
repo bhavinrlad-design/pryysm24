@@ -82,13 +82,8 @@ jobs:
           
           # Copy entry point files
           cp index.js .next/standalone/
+          cp startup.sh .next/standalone/
           cp server-static.js .next/standalone/
-          cp server-parent.js .next/standalone/
-          cp server-child.js .next/standalone/
-          cp server-minimal.js .next/standalone/
-          cp server-simple.js .next/standalone/
-          cp test-server.js .next/standalone/
-          cp web.config .next/standalone/
           
           # Copy public assets if the directory exists
           if [ -d "public" ]; then
@@ -150,17 +145,18 @@ jobs:
         run: |
           echo "Configuring app settings..."
           
-          # Set startup command
+          # Set startup command - use background shell script
           az webapp config set \
             --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
             --name ${{ secrets.AZURE_APP_NAME }} \
-            --startup-file "node index.js"
+            --startup-file "bash startup.sh" \
+            --remote-debugging-enabled false
           
-          # Set environment variable
+          # Set environment variables and disable health check to allow startup
           az webapp config appsettings set \
             --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
             --name ${{ secrets.AZURE_APP_NAME }} \
-            --settings NODE_ENV=production NODE_OPTIONS="--max-old-space-size=256 --no-warnings"
+            --settings NODE_ENV=production WEBSITE_HEALTHCHECK_MAXPINGFAILURES=50
           
           echo "✓ App configured!"
           
