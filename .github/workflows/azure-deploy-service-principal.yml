@@ -93,7 +93,9 @@ jobs:
           
           # Copy entry point files
           cp index.js .next/standalone/
+          cp server-sync.js .next/standalone/
           cp server-ultimate.js .next/standalone/
+          cp server-parallel.js .next/standalone/
           cp web.config .next/standalone/
           
           echo "✓ Build prep complete"
