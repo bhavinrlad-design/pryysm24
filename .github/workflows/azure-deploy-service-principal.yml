@@ -80,6 +80,8 @@ jobs:
           
           # Copy entry point files
           cp index.js .next/standalone/
+          cp server-parent.js .next/standalone/
+          cp server-child.js .next/standalone/
           cp server-minimal.js .next/standalone/
           cp server-simple.js .next/standalone/
           cp test-server.js .next/standalone/
