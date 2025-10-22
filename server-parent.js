@@ -24,7 +24,10 @@ let nextProcess = null;
 function spawnNextJs() {
   console.log(`[${now()}] PARENT: Spawning Next.js child process on port ${nextPort}`);
   
-  nextProcess = spawn('node', ['server-child.js'], {
+  const childPath = require('path').join(process.cwd(), 'server-child.js');
+  console.log(`[${now()}] PARENT: Child path: ${childPath}`);
+  
+  nextProcess = spawn('node', [childPath], {
     cwd: process.cwd(),
     env: {
       ...process.env,
@@ -35,14 +38,18 @@ function spawnNextJs() {
   });
 
   // Log child stdout
-  nextProcess.stdout.on('data', (data) => {
-    console.log(`[${now()}] [CHILD:OUT]`, data.toString().trim());
-  });
+  if (nextProcess.stdout) {
+    nextProcess.stdout.on('data', (data) => {
+      console.log(`[${now()}] [CHILD:OUT]`, data.toString().trim());
+    });
+  }
 
   // Log child stderr
-  nextProcess.stderr.on('data', (data) => {
-    console.log(`[${now()}] [CHILD:ERR]`, data.toString().trim());
-  });
+  if (nextProcess.stderr) {
+    nextProcess.stderr.on('data', (data) => {
+      console.log(`[${now()}] [CHILD:ERR]`, data.toString().trim());
+    });
+  }
 
   // Handle child exit
   nextProcess.on('exit', (code) => {
@@ -97,7 +104,7 @@ const server = http.createServer((req, res) => {
   // Health checks always respond immediately
   if (req.url === '/health' || req.url === '/_health') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ status: 'ok' }));
+    res.end(JSON.stringify({ status: 'ok', nextReady: nextReady }));
     return;
   }
 
@@ -117,8 +124,20 @@ const server = http.createServer((req, res) => {
 
     proxyReq.on('error', (err) => {
       console.error(`[${now()}] PARENT: Proxy error:`, err.message);
-      res.writeHead(502);
-      res.end('Bad Gateway');
+      // Try loading page instead of 502
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      res.end(`<!DOCTYPE html>
+<html>
+<head>
+  <title>Reloading</title>
+  <meta http-equiv="refresh" content="2">
+</head>
+<body style="font-family: sans-serif; text-align: center; padding: 100px;">
+  <h1>⏳ Application Initializing</h1>
+  <p>Next.js is starting, please wait...</p>
+  <p style="font-size: 0.9em; color: #666;">Auto-refresh in 2 seconds</p>
+</body>
+</html>`);
     });
 
     proxyReq.on('timeout', () => {
