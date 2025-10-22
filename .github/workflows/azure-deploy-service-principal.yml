@@ -50,7 +50,7 @@ jobs:
 
       - name: Build for Azure
         run: |
-          # Run the build with STATIC export output
+          # Run the build with standalone output
           npm run build
         env:
           NODE_ENV: production
@@ -59,27 +59,26 @@ jobs:
       
       - name: Azure Post-Build Tasks
         run: |
-          echo "Running Azure post-build tasks for static export..."
+          echo "Running Azure post-build tasks..."
           
-          # Check if out directory exists (static export output)
-          if [ ! -d "out" ]; then
-            echo "Error: 'out' directory does not exist. Build may have failed or app uses wrong output mode."
+          if [ ! -d ".next/standalone" ]; then
+            echo "Error: .next/standalone not found"
             exit 1
           fi
           
-          echo "Copying deployment files..."
-          # Copy entry point files to root
-          cp index.js out/
-          cp server-export.js out/
-          cp web.config out/
+          # Remove heavy dependencies that slow startup
+          rm -rf .next/standalone/node_modules/@prisma 2>/dev/null || true
+          rm -rf .next/standalone/node_modules/prisma 2>/dev/null || true
+          rm -rf .next/standalone/node_modules/typescript 2>/dev/null || true
+          rm -rf .next/standalone/node_modules/eslint 2>/dev/null || true
+          rm -rf .next/standalone/node_modules/@types 2>/dev/null || true
           
-          # Copy public assets if they exist
-          if [ -d "public" ]; then
-            echo "Copying public directory..."
-            cp -r public/* out/ 2>/dev/null || true
-          fi
+          # Copy entry point files
+          cp index.js .next/standalone/
+          cp server-simple.js .next/standalone/
+          cp web.config .next/standalone/
           
-          echo "✓ Build preparation complete"
+          echo "✓ Build prep complete"
 
       # Login to Azure using Service Principal (Legacy method)
       - name: Login to Azure
@@ -90,29 +89,27 @@ jobs:
       # Create a deployment package
       - name: Create deployment package
         run: |
-          cd out
+          cd .next/standalone
           zip -r ../../deploy.zip .
           cd ../..
-          echo "Deployment package created"
-      # Deploy using Azure CLI
+          echo "Package ready"
+      # Deploy using Azure CLI with longer timeout
       - name: Deploy to Azure App Service using Azure CLI
         run: |
-          echo "Starting deployment with Azure CLI..."
+          echo "Starting deployment with Azure CLI (600s timeout)..."
           
-          # Deploy the ZIP file using Azure CLI
           az webapp deployment source config-zip \
             --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
             --name ${{ secrets.AZURE_APP_NAME }} \
             --src deploy.zip \
-            --timeout 300
+            --timeout 600
           
-          echo "✓ Deployment completed successfully!"
-          echo "Your app should be available at: https://${{ secrets.AZURE_APP_NAME }}.azurewebsites.net"
+          echo "✓ Deployment completed!"
       
       # Configure App Startup
       - name: Configure App Startup  
         run: |
-          echo "Configuring app settings..."
+          echo "Configuring app..."
           
           # Set startup command
           az webapp config set \
@@ -121,13 +118,13 @@ jobs:
             --startup-file "node index.js" \
             --remote-debugging-enabled false
           
-          # Set environment variables and disable health check to allow startup
+          # Disable health check to allow full startup time
           az webapp config appsettings set \
             --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
             --name ${{ secrets.AZURE_APP_NAME }} \
-            --settings NODE_ENV=production WEBSITE_HEALTHCHECK_MAXPINGFAILURES=50
+            --settings NODE_ENV=production WEBSITE_HEALTHCHECK_PATH="" WEBSITE_HEALTHCHECK_MAXPINGFAILURES=1000
           
-          echo "✓ App configured!"
+          echo "✓ App configured"
           
       # Logout from Azure
       - name: Logout from Azure

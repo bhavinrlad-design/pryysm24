@@ -2,9 +2,8 @@ const path = require('path');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
+  output: 'standalone',
   images: {
-    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',
