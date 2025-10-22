@@ -10,17 +10,27 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 export default function LandingPage() {
   
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-b from-white via-blue-50/30 to-white text-slate-900">
+    <div className="flex flex-col min-h-screen bg-gradient-to-b from-white via-blue-50/30 to-white text-slate-900" style={{
+      backgroundImage: 'linear-gradient(to bottom, rgb(255, 255, 255), rgba(219, 234, 254, 0.3), rgb(255, 255, 255))',
+      color: '#1e293b'
+    }}>
       {/* Header/Navigation */}
-      <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-md border-b border-slate-200/50 shadow-sm">
+      <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-md border-b border-slate-200/50 shadow-sm" style={{
+        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+        borderBottom: '1px solid rgba(226, 232, 240, 0.5)',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)',
+      }}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg">
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg" style={{
+              background: 'linear-gradient(to bottom right, #004B8D, #E6A635)',
+              boxShadow: '0 10px 15px rgba(0, 0, 0, 0.10), 0 4px 6px rgba(0, 0, 0, 0.05)',
+            }}>
               <Layers className="h-6 w-6 text-white" />
             </div>
             <div>
-              <div className="text-sm font-bold text-slate-900 leading-tight">Pryysm</div>
-              <div className="text-xs text-slate-500 font-medium">by 3D Prodigy</div>
+              <div className="text-sm font-bold text-slate-900 leading-tight" style={{color: '#111827'}}>Pryysm</div>
+              <div className="text-xs text-slate-500 font-medium" style={{color: '#6b7280'}}>by 3D Prodigy</div>
             </div>
           </Link>
           
@@ -64,16 +74,30 @@ export default function LandingPage() {
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="flex flex-col items-center text-center space-y-8 max-w-4xl mx-auto">
               {/* Badge */}
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20 backdrop-blur-sm">
-                <Zap className="h-4 w-4 text-primary" />
-                <span className="text-sm font-semibold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20 backdrop-blur-sm" style={{
+                backgroundColor: 'rgba(0, 75, 141, 0.1)',
+                border: '1px solid rgba(0, 75, 141, 0.2)',
+                backdropFilter: 'blur(4px)',
+              }}>
+                <Zap className="h-4 w-4" style={{color: '#004B8D'}} />
+                <span className="text-sm font-semibold" style={{
+                  background: 'linear-gradient(to right, #004B8D, #E6A635)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                }}>
                   Next-Gen 3D Printing OS
                 </span>
               </div>
 
               {/* Main Headline */}
               <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-tight">
-                <span className="bg-gradient-to-r from-slate-900 via-primary to-accent bg-clip-text text-transparent">
+                <span style={{
+                  background: 'linear-gradient(to right, #111827 25%, #004B8D 50%, #E6A635 75%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                }}>
                   Transform Your 3D Printing Operation
                 </span>
               </h1>
