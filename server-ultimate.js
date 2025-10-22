@@ -74,15 +74,18 @@ const server = http.createServer((req, res) => {
     })();
   }
 
-  // Still loading - return holding page
-  res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+  // Send immediate loading response
+  res.writeHead(200, { 
+    'Content-Type': 'text/html; charset=utf-8',
+    'Refresh': '2'  // Browser auto-refresh every 2 seconds
+  });
   res.end(`<!DOCTYPE html>
 <html>
-<head><title>Starting</title><meta http-equiv="refresh" content="3"></head>
-<body style="font-family:sans-serif;text-align:center;padding:100px">
-<h1>⏳ Application Initializing</h1>
-<p>Next.js is loading...</p>
-<p><small>Auto-refresh in 3 seconds</small></p>
+<head><title>Starting</title></head>
+<body style="font-family:sans-serif;text-align:center;padding:100px;background:#f0f0f0">
+<h1>⏳ Loading Application</h1>
+<p>Initializing Next.js server...</p>
+<p><small>Page will refresh automatically</small></p>
 </body>
 </html>`);
 });
