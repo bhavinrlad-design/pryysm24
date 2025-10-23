@@ -1,24 +1,13 @@
 
+
 "use client"
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/use-auth'
-import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
 import { Layers, Loader2, Eye, EyeOff, UserCheck, LogIn } from 'lucide-react'
 import Link from 'next/link'
-import { Separator } from '@/components/ui/separator'
 
 export default function LoginPage() {
     const router = useRouter();
@@ -41,7 +30,6 @@ export default function LoginPage() {
                 title: 'Login Successful',
                 description: 'Welcome back!',
             });
-            // The router push is handled inside the login function
         } else {
             toast({
                 variant: 'destructive',
@@ -71,92 +59,112 @@ export default function LoginPage() {
     }
 
   return (
-    <div className="flex flex-col min-h-screen items-center justify-center bg-muted/40 p-4">
-        <div className="w-full max-w-sm">
-            <div className="flex flex-col items-center justify-center mb-8">
-                <Link href="/" className="flex items-center justify-center mb-4" prefetch={false}>
-                    <div className="h-14 w-14 flex items-center justify-center rounded-lg bg-white text-accent border shadow-sm">
-                        <Layers className="h-8 w-8 text-yellow-500" />
+    <div style={{display: 'flex', flexDirection: 'column', minHeight: '100vh', alignItems: 'center', justifyContent: 'center', backgroundColor: '#F9FAFB', padding: '1rem', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif'}}>
+        <div style={{width: '100%', maxWidth: '28rem'}}>
+            {/* Header with Logo */}
+            <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', marginBottom: '2rem'}}>
+                <Link href="/" style={{display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem', textDecoration: 'none'}} prefetch={false}>
+                    <div style={{height: '3.5rem', width: '3.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '0.5rem', backgroundColor: 'white', border: '1px solid #E5E7EB', boxShadow: '0 1px 2px rgba(0,0,0,0.05)'}}>
+                        <Layers style={{height: '2rem', width: '2rem', color: '#E6A635'}} />
                     </div>
                 </Link>
-                <h1 className="text-2xl font-bold text-primary">
+                <h1 style={{fontSize: '1.875rem', fontWeight: 700, color: '#004B8D', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif'}}>
                     Welcome to Pryysm
                 </h1>
-                 <p className="text-sm text-muted-foreground mt-2">by 3D Prodigy</p>
+                <p style={{fontSize: '0.875rem', color: '#6B7280', marginTop: '0.5rem', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif'}}>by 3D Prodigy</p>
             </div>
             
-            <Card>
-                <CardHeader className="text-center">
-                    <CardTitle className="text-xl">Sign In</CardTitle>
-                    <CardDescription>Access your 3D printing farm dashboard.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                   <form onSubmit={handleLogin} className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="email">Email</Label>
-                        <Input
-                          id="email"
-                          type="email"
-                          placeholder="m@example.com"
-                          required
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                         <div className="flex items-center">
-                            <Label htmlFor="password">Password</Label>
-                            <Link
-                              href="#"
-                              className="ml-auto inline-block text-sm text-muted-foreground hover:text-primary underline"
-                            >
-                              Forgot password?
-                            </Link>
-                          </div>
-                          <div className="relative">
-                              <Input 
-                                  id="password" 
-                                  type={showPassword ? "text" : "password"} 
-                                  required 
-                                  value={password}
-                                  onChange={(e) => setPassword(e.target.value)}
-                              />
-                               <button
-                                  type="button"
-                                  onClick={() => setShowPassword(!showPassword)}
-                                  className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground"
-                              >
-                                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                              </button>
-                          </div>
-                      </div>
-                      <Button type="submit" className="w-full" disabled={isLoading || isDemoLoading}>
-                         {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogIn className="mr-2 h-4 w-4" />}
-                          Sign in
-                        </Button>
-                    </form>
+            {/* Login Card */}
+            <div style={{backgroundColor: 'white', borderRadius: '0.75rem', border: '1px solid #E5E7EB', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', padding: '2rem'}}>
+                {/* Card Header */}
+                <div style={{textAlign: 'center', marginBottom: '2rem'}}>
+                    <h2 style={{fontSize: '1.25rem', fontWeight: 700, color: '#111827', marginBottom: '0.5rem', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif'}}>Sign In</h2>
+                    <p style={{fontSize: '0.875rem', color: '#6B7280', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif'}}>Access your 3D printing farm dashboard.</p>
+                </div>
 
-                    <div className="relative my-6">
-                        <div className="absolute inset-0 flex items-center">
-                            <span className="w-full border-t" />
+                {/* Login Form */}
+                <form onSubmit={handleLogin} style={{display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '1.5rem'}}>
+                    {/* Email Input */}
+                    <div style={{display: 'flex', flexDirection: 'column', gap: '0.5rem'}}>
+                        <label htmlFor="email" style={{fontSize: '0.875rem', fontWeight: 600, color: '#111827', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif'}}>Email</label>
+                        <input
+                            id="email"
+                            type="email"
+                            placeholder="m@example.com"
+                            required
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            style={{padding: '0.625rem 0.75rem', fontSize: '0.875rem', border: '1px solid #D1D5DB', borderRadius: '0.375rem', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif', backgroundColor: 'white', color: '#111827'}}
+                        />
+                    </div>
+
+                    {/* Password Input */}
+                    <div style={{display: 'flex', flexDirection: 'column', gap: '0.5rem'}}>
+                        <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+                            <label htmlFor="password" style={{fontSize: '0.875rem', fontWeight: 600, color: '#111827', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif'}}>Password</label>
+                            <Link href="#" style={{fontSize: '0.875rem', color: '#004B8D', textDecoration: 'none', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif'}}>Forgot password?</Link>
                         </div>
-                        <div className="relative flex justify-center text-xs uppercase">
-                            <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+                        <div style={{position: 'relative'}}>
+                            <input
+                                id="password"
+                                type={showPassword ? "text" : "password"}
+                                required
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                style={{width: '100%', padding: '0.625rem 0.75rem', fontSize: '0.875rem', border: '1px solid #D1D5DB', borderRadius: '0.375rem', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif', backgroundColor: 'white', color: '#111827', boxSizing: 'border-box'}}
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                style={{position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)', display: 'flex', alignItems: 'center', background: 'none', border: 'none', cursor: 'pointer', color: '#6B7280', padding: 0}}
+                            >
+                                {showPassword ? <EyeOff style={{height: '1.25rem', width: '1.25rem'}} /> : <Eye style={{height: '1.25rem', width: '1.25rem'}} />}
+                            </button>
                         </div>
                     </div>
 
-                    <Button variant="secondary" type="button" className="w-full" onClick={handleDemoLogin} disabled={isLoading || isDemoLoading}>
-                        {isDemoLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <UserCheck className="mr-2 h-4 w-4" />}
-                        Sign in as Demo User
-                    </Button>
-                </CardContent>
-                <CardFooter className="flex-col gap-4 text-center">
-                </CardFooter>
-            </Card>
+                    {/* Sign In Button */}
+                    <button 
+                        type="submit" 
+                        disabled={isLoading || isDemoLoading}
+                        style={{width: '100%', padding: '0.625rem 1rem', marginTop: '0.5rem', fontSize: '0.875rem', fontWeight: 600, color: 'white', backgroundColor: isLoading || isDemoLoading ? '#9CA3AF' : '#004B8D', border: 'none', borderRadius: '0.375rem', cursor: isLoading || isDemoLoading ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', transition: 'all 0.2s ease', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif'}}
+                    >
+                        {isLoading ? <Loader2 style={{height: '1rem', width: '1rem', animation: 'spin 1s linear infinite'}} /> : <LogIn style={{height: '1rem', width: '1rem'}} />}
+                        Sign in
+                    </button>
+                </form>
+
+                {/* Divider */}
+                <div style={{position: 'relative', margin: '1.5rem 0'}}>
+                    <div style={{position: 'absolute', top: '50%', left: 0, right: 0, borderTop: '1px solid #E5E7EB', transform: 'translateY(-50%)'}}></div>
+                    <div style={{position: 'relative', display: 'flex', justifyContent: 'center'}}>
+                        <span style={{backgroundColor: 'white', padding: '0 0.5rem', fontSize: '0.75rem', fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif'}}>Or continue with</span>
+                    </div>
+                </div>
+
+                {/* Demo Login Button */}
+                <button 
+                    type="button" 
+                    onClick={handleDemoLogin}
+                    disabled={isLoading || isDemoLoading}
+                    style={{width: '100%', padding: '0.625rem 1rem', fontSize: '0.875rem', fontWeight: 600, color: '#004B8D', backgroundColor: 'white', border: '1px solid #004B8D', borderRadius: '0.375rem', cursor: isLoading || isDemoLoading ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', transition: 'all 0.2s ease', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif'}}
+                >
+                    {isDemoLoading ? <Loader2 style={{height: '1rem', width: '1rem', animation: 'spin 1s linear infinite'}} /> : <UserCheck style={{height: '1rem', width: '1rem'}} />}
+                    Sign in as Demo User
+                </button>
+            </div>
         </div>
-         <p className="text-center text-sm text-muted-foreground mt-8">
+
+        {/* Footer */}
+        <p style={{textAlign: 'center', fontSize: '0.875rem', color: '#6B7280', marginTop: '2rem', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif'}}>
             &copy; {new Date().getFullYear()} Pryysm by 3D Prodigy.
         </p>
+
+        <style>{`
+            @keyframes spin {
+                to { transform: rotate(360deg); }
+            }
+        `}</style>
     </div>
   )
 }
