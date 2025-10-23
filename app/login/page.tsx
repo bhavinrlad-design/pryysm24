@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/use-auth'
 import { useToast } from "@/hooks/use-toast"
-import { Loader2, Eye, EyeOff, UserCheck, LogIn } from 'lucide-react'
+import { Layers, Loader2, Eye, EyeOff, UserCheck, LogIn } from 'lucide-react'
 import Link from 'next/link'
 
 export default function LoginPage() {
@@ -84,21 +84,8 @@ export default function LoginPage() {
             {/* Header with Logo */}
             <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', marginBottom: '2rem'}}>
                 <Link href="/" style={{display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem', textDecoration: 'none'}} prefetch={false}>
-                    <div style={{height: '3.5rem', width: '3.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '0.5rem', backgroundColor: '#004B8D', padding: '0.5rem'}}>
-                        {/* Pryysm Logo - Replace with your actual logo */}
-                        <svg viewBox="0 0 100 100" style={{width: '100%', height: '100%'}} xmlns="http://www.w3.org/2000/svg">
-                            {/* Main 'P' Shape with 3D effect */}
-                            <defs>
-                                <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                    <stop offset="0%" style={{stopColor: '#E6A635', stopOpacity: 1}} />
-                                    <stop offset="100%" style={{stopColor: '#FFD966', stopOpacity: 1}} />
-                                </linearGradient>
-                            </defs>
-                            {/* 'P' Letter with 3D effect */}
-                            <path d="M 30 20 L 30 80 L 50 80 Q 65 80 65 65 Q 65 50 50 50 L 30 50" stroke="url(#logoGradient)" strokeWidth="8" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-                            {/* Accent dot representing 3D printing */}
-                            <circle cx="55" cy="70" r="4" fill="url(#logoGradient)" />
-                        </svg>
+                    <div style={{height: '3.5rem', width: '3.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '0.5rem', backgroundColor: 'white', border: '1px solid #E5E7EB', boxShadow: '0 1px 2px rgba(0,0,0,0.05)'}}>
+                        <Layers style={{height: '2rem', width: '2rem', color: '#E6A635'}} />
                     </div>
                 </Link>
                 <h1 style={{fontSize: '1.875rem', fontWeight: 700, color: '#004B8D', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif'}}>
