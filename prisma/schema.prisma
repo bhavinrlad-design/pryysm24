@@ -8,6 +8,31 @@ generator client {
   provider = "prisma-client-js"
 }
 
+model User {
+  id            String     @id @default(cuid())
+  email         String     @unique
+  name          String
+  passwordHash  String
+  role          String     @default("admin") // admin or master
+  companyName   String?
+  numPrinters   String?
+  country       String?
+  industry      String?
+  avatar        String?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  sessions      Session[]
+}
+
+model Session {
+  id            String     @id @default(cuid())
+  sessionToken  String     @unique
+  userId        String
+  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expires       DateTime
+  createdAt     DateTime   @default(now())
+}
+
 model Printer {
   id        Int     @id @default(autoincrement())
   name      String

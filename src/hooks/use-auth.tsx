@@ -134,19 +134,50 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     const signupWithEmail = async (signupData: Omit<User, 'role'> & {password: string}): Promise<boolean> => {
-        const { email, name, ...rest } = signupData;
+        const { email, name, password, ...rest } = signupData;
         try {
-            // Simple signup - store user in localStorage
-            const appUser = handleUser({ 
-                name, 
-                email, 
-                role: 'admin', 
-                ...rest 
+            console.log('📝 Signup attempt:', email);
+            
+            // Call signup API
+            const response = await fetch('/api/auth/signup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email,
+                    password,
+                    name,
+                    companyName: rest.companyName,
+                    numPrinters: rest.numPrinters,
+                    country: rest.country,
+                    industry: rest.industry,
+                }),
             });
+
+            if (!response.ok) {
+                const error = await response.json();
+                console.error('❌ Signup failed:', error.error);
+                return false;
+            }
+
+            const { user: apiUser } = await response.json();
+            console.log('✅ Signup successful:', apiUser.email);
+
+            // Convert API user to app user format
+            const appUser = handleUser({
+                name: apiUser.name,
+                email: apiUser.email,
+                role: 'admin',
+                companyName: apiUser.companyName,
+                numPrinters: apiUser.numPrinters,
+                country: apiUser.country,
+                industry: apiUser.industry,
+                avatar: apiUser.avatar,
+            });
+
             localStorage.setItem('new_signup', 'true');
             return navigateAfterLogin(appUser);
         } catch (error) {
-            console.error("Signup Error:", error);
+            console.error("❌ Signup Error:", error);
             return false;
         }
     };
@@ -154,42 +185,50 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const loginWithEmail = async (email: string, pass: string): Promise<boolean> => {
         console.log('🔐 Login attempt:', email);
         
-        // Handle mock users first
-        if (email === 'demo@prysm.com' && pass === 'demo123') {
-            console.log('✅ Demo user credentials matched');
-            const userToLogin: User = { name: 'Demo User', email, role: 'admin' };
+        try {
+            // Call login API
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password: pass }),
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                console.error('❌ Login failed:', error.error);
+                return false;
+            }
+
+            const { user: apiUser } = await response.json();
+            console.log('✅ Database login successful:', apiUser.email);
+
+            // Convert API user to app user format
+            const userToLogin: User = {
+                name: apiUser.name,
+                email: apiUser.email,
+                role: apiUser.role === 'master' ? 'master' : 'admin',
+                companyName: apiUser.companyName,
+                numPrinters: apiUser.numPrinters,
+                country: apiUser.country,
+                industry: apiUser.industry,
+                avatar: apiUser.avatar,
+            };
+
             const result = handleUser(userToLogin);
             console.log('✅ handleUser returned:', result);
             const navigateResult = navigateAfterLogin(result);
             console.log('✅ navigateAfterLogin result:', navigateResult);
             return navigateResult;
-        }
-        
-        if ((email === 'LAD@PRYYSM' && pass === 'Lad@1234') || (email === 'LAD@admin.com' && pass === 'Lad123')) {
-            console.log('✅ LAD master user credentials matched');
-            const userToLogin: User = { name: 'LAD', email, role: 'master' };
-            return navigateAfterLogin(handleUser(userToLogin));
-        }
-        
-        if (email === 'admin@prysm.com' && pass === 'Lad123') {
-            console.log('✅ Admin user credentials matched');
-            const userToLogin: User = { name: 'Admin User', email, role: 'admin' };
-            return navigateAfterLogin(handleUser(userToLogin));
-        }
-
-        // Simple email/password login (for development)
-        try {
-            console.log('ℹ️ Accepting any email/password (development mode)');
-            // For now, accept any email/password combination
-            const userToLogin: User = { 
-                name: email.split('@')[0], 
-                email, 
-                role: 'admin' 
-            };
-            const loggedInUser = handleUser(userToLogin);
-            return navigateAfterLogin(loggedInUser);
         } catch (error) {
-            console.error("❌ Login Error: ", error);
+            console.error('❌ Login error:', error);
+            // Fallback: Try demo account for backward compatibility
+            if (email === 'demo@prysm.com' && pass === 'demo123') {
+                console.log('✅ Demo user credentials matched (fallback)');
+                const userToLogin: User = { name: 'Demo User', email, role: 'admin' };
+                const result = handleUser(userToLogin);
+                const navigateResult = navigateAfterLogin(result);
+                return navigateResult;
+            }
             return false;
         }
     };
