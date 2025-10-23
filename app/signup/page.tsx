@@ -1,30 +1,13 @@
 
+
 "use client"
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/use-auth'
-import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
 import { Layers, Loader2, CheckCircle, UserPlus } from 'lucide-react'
 import Link from 'next/link'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 
 const countryList = [
     { code: 'AF', name: 'Afghanistan' },
@@ -329,105 +312,118 @@ export default function SignupPage() {
     }
 
   return (
-    <div className="flex flex-col min-h-screen items-center justify-center bg-muted/40 p-4">
-       <div className="w-full max-w-md">
-            <div className="flex flex-col items-center justify-center mb-8">
-                <Link href="/" className="flex items-center justify-center mb-4" prefetch={false}>
-                    <div className="h-14 w-14 flex items-center justify-center rounded-lg bg-white text-accent border shadow-sm">
-                        <Layers className="h-8 w-8 text-yellow-500" />
+    <div style={{display: 'flex', flexDirection: 'column', minHeight: '100vh', alignItems: 'center', justifyContent: 'center', backgroundColor: '#F9FAFB', padding: '1rem', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif'}}>
+       <div style={{width: '100%', maxWidth: '32rem'}}>
+            {/* Header with Logo */}
+            <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', marginBottom: '2rem'}}>
+                <Link href="/" style={{display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem', textDecoration: 'none'}} prefetch={false}>
+                    <div style={{height: '3.5rem', width: '3.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '0.5rem', backgroundColor: 'white', border: '1px solid #E5E7EB', boxShadow: '0 1px 2px rgba(0,0,0,0.05)'}}>
+                        <Layers style={{height: '2rem', width: '2rem', color: '#E6A635'}} />
                     </div>
                 </Link>
-                <h1 className="text-2xl font-bold text-primary">
+                <h1 style={{fontSize: '1.875rem', fontWeight: 700, color: '#004B8D', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif', textAlign: 'center'}}>
                     Create Your Pryysm Account
                 </h1>
-                 <p className="text-sm text-muted-foreground mt-2">by 3D Prodigy</p>
+                <p style={{fontSize: '0.875rem', color: '#6B7280', marginTop: '0.5rem', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif'}}>by 3D Prodigy</p>
             </div>
             
             {signupSuccess ? (
-                <Card className="w-full">
-                    <CardContent className="pt-6 text-center">
-                        <CheckCircle className="mx-auto h-16 w-16 text-green-500" />
-                        <h1 className="text-2xl font-bold text-primary mt-4">Welcome, {name}!</h1>
-                        <p className="mt-2 text-muted-foreground">
-                            Your account has been created successfully.
-                        </p>
-                         <p className="text-sm text-muted-foreground mt-4">Redirecting you to your dashboard...</p>
-                    </CardContent>
-                </Card>
+                <div style={{backgroundColor: 'white', borderRadius: '0.75rem', border: '1px solid #E5E7EB', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', padding: '2rem', textAlign: 'center'}}>
+                    <CheckCircle style={{height: '4rem', width: '4rem', color: '#10b981', margin: '0 auto', marginBottom: '1rem'}} />
+                    <h1 style={{fontSize: '1.875rem', fontWeight: 700, color: '#004B8D', marginTop: '1rem', marginBottom: '0.5rem', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif'}}>Welcome, {name}!</h1>
+                    <p style={{marginTop: '0.5rem', color: '#6B7280', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif'}}>
+                        Your account has been created successfully.
+                    </p>
+                    <p style={{fontSize: '0.875rem', color: '#6B7280', marginTop: '1rem', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif'}}>Redirecting you to your dashboard...</p>
+                </div>
             ) : (
-                <Card>
-                    <CardHeader className="text-center">
-                        <CardTitle className="text-xl">Get Started</CardTitle>
-                        <CardDescription>
-                            Join Pryysm and take control of your 3D print farm.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent className="max-h-[60vh] overflow-y-auto px-6 py-0">
-                    <form onSubmit={handleSignup} className="space-y-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="name">Full Name</Label>
-                            <Input id="name" type="text" placeholder="John Doe" required value={name} onChange={(e) => setName(e.target.value)} />
+                <div style={{backgroundColor: 'white', borderRadius: '0.75rem', border: '1px solid #E5E7EB', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', padding: '2rem'}}>
+                    {/* Card Header */}
+                    <div style={{textAlign: 'center', marginBottom: '1.5rem'}}>
+                        <h2 style={{fontSize: '1.25rem', fontWeight: 700, color: '#111827', marginBottom: '0.5rem', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif'}}>Get Started</h2>
+                        <p style={{fontSize: '0.875rem', color: '#6B7280', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif'}}>Join Pryysm and take control of your 3D print farm.</p>
+                    </div>
+
+                    {/* Form Container - Scrollable */}
+                    <form onSubmit={handleSignup} style={{display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: '60vh', overflowY: 'auto', paddingRight: '0.5rem'}}>
+                        {/* Full Name */}
+                        <div style={{display: 'flex', flexDirection: 'column', gap: '0.5rem'}}>
+                            <label style={{fontSize: '0.875rem', fontWeight: 600, color: '#111827', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif'}}>Full Name</label>
+                            <input type="text" placeholder="John Doe" required value={name} onChange={(e) => setName(e.target.value)} style={{padding: '0.625rem 0.75rem', fontSize: '0.875rem', border: '1px solid #D1D5DB', borderRadius: '0.375rem', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif', backgroundColor: 'white', color: '#111827'}} />
                         </div>
 
-                        <div className="space-y-2">
-                            <Label htmlFor="email">Email Address</Label>
-                            <Input id="email" type="email" placeholder="m@example.com" required value={email} onChange={(e) => setEmail(e.target.value)} />
+                        {/* Email */}
+                        <div style={{display: 'flex', flexDirection: 'column', gap: '0.5rem'}}>
+                            <label style={{fontSize: '0.875rem', fontWeight: 600, color: '#111827', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif'}}>Email Address</label>
+                            <input type="email" placeholder="m@example.com" required value={email} onChange={(e) => setEmail(e.target.value)} style={{padding: '0.625rem 0.75rem', fontSize: '0.875rem', border: '1px solid #D1D5DB', borderRadius: '0.375rem', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif', backgroundColor: 'white', color: '#111827'}} />
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="companyName">Company Name</Label>
-                                <Input id="companyName" type="text" placeholder="Your Company Inc." value={companyName} onChange={(e) => setCompanyName(e.target.value)} />
+                        {/* Company Name & Printers - 2 Column */}
+                        <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem'}}>
+                            <div style={{display: 'flex', flexDirection: 'column', gap: '0.5rem'}}>
+                                <label style={{fontSize: '0.875rem', fontWeight: 600, color: '#111827', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif'}}>Company Name</label>
+                                <input type="text" placeholder="Your Company Inc." value={companyName} onChange={(e) => setCompanyName(e.target.value)} style={{padding: '0.625rem 0.75rem', fontSize: '0.875rem', border: '1px solid #D1D5DB', borderRadius: '0.375rem', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif', backgroundColor: 'white', color: '#111827'}} />
                             </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="numPrinters">No. of Printers</Label>
-                                <Input id="numPrinters" type="number" placeholder="e.g., 5" value={numPrinters} onChange={(e) => setNumPrinters(e.target.value)} />
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="country">Country</Label>
-                                <Select onValueChange={setCountry} value={country}>
-                                    <SelectTrigger id="country"><SelectValue placeholder="Select country..." /></SelectTrigger>
-                                    <SelectContent>{countryList.map(c => <SelectItem key={c.code} value={c.name}>{c.name}</SelectItem>)}</SelectContent>
-                                </Select>
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="industry">Industry</Label>
-                                <Select onValueChange={setIndustry} value={industry}>
-                                    <SelectTrigger id="industry"><SelectValue placeholder="Select industry..." /></SelectTrigger>
-                                    <SelectContent>{industries.map(i => <SelectItem key={i} value={i}>{i}</SelectItem>)}</SelectContent>
-                                </Select>
+                            <div style={{display: 'flex', flexDirection: 'column', gap: '0.5rem'}}>
+                                <label style={{fontSize: '0.875rem', fontWeight: 600, color: '#111827', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif'}}>No. of Printers</label>
+                                <input type="number" placeholder="e.g., 5" value={numPrinters} onChange={(e) => setNumPrinters(e.target.value)} style={{padding: '0.625rem 0.75rem', fontSize: '0.875rem', border: '1px solid #D1D5DB', borderRadius: '0.375rem', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif', backgroundColor: 'white', color: '#111827'}} />
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="password">Password</Label>
-                                <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+                        {/* Country & Industry - 2 Column */}
+                        <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem'}}>
+                            <div style={{display: 'flex', flexDirection: 'column', gap: '0.5rem'}}>
+                                <label style={{fontSize: '0.875rem', fontWeight: 600, color: '#111827', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif'}}>Country</label>
+                                <select value={country} onChange={(e) => setCountry(e.target.value)} style={{padding: '0.625rem 0.75rem', fontSize: '0.875rem', border: '1px solid #D1D5DB', borderRadius: '0.375rem', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif', backgroundColor: 'white', color: '#111827', cursor: 'pointer'}}>
+                                    <option value="">Select country...</option>
+                                    {countryList.map(c => <option key={c.code} value={c.name}>{c.name}</option>)}
+                                </select>
                             </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="confirmPassword">Confirm Password</Label>
-                                <Input id="confirmPassword" type="password" required value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+                            <div style={{display: 'flex', flexDirection: 'column', gap: '0.5rem'}}>
+                                <label style={{fontSize: '0.875rem', fontWeight: 600, color: '#111827', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif'}}>Industry</label>
+                                <select value={industry} onChange={(e) => setIndustry(e.target.value)} style={{padding: '0.625rem 0.75rem', fontSize: '0.875rem', border: '1px solid #D1D5DB', borderRadius: '0.375rem', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif', backgroundColor: 'white', color: '#111827', cursor: 'pointer'}}>
+                                    <option value="">Select industry...</option>
+                                    {industries.map(i => <option key={i} value={i}>{i}</option>)}
+                                </select>
+                            </div>
+                        </div>
+
+                        {/* Password & Confirm - 2 Column */}
+                        <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem'}}>
+                            <div style={{display: 'flex', flexDirection: 'column', gap: '0.5rem'}}>
+                                <label style={{fontSize: '0.875rem', fontWeight: 600, color: '#111827', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif'}}>Password</label>
+                                <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} style={{padding: '0.625rem 0.75rem', fontSize: '0.875rem', border: '1px solid #D1D5DB', borderRadius: '0.375rem', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif', backgroundColor: 'white', color: '#111827'}} />
+                            </div>
+                            <div style={{display: 'flex', flexDirection: 'column', gap: '0.5rem'}}>
+                                <label style={{fontSize: '0.875rem', fontWeight: 600, color: '#111827', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif'}}>Confirm Password</label>
+                                <input type="password" required value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} style={{padding: '0.625rem 0.75rem', fontSize: '0.875rem', border: '1px solid #D1D5DB', borderRadius: '0.375rem', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif', backgroundColor: 'white', color: '#111827'}} />
                             </div>
                         </div>
                         
-                        <Button type="submit" className="w-full" disabled={isLoading}>
-                            {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <UserPlus className="mr-2 h-4 w-4" />}
+                        {/* Create Account Button */}
+                        <button 
+                            type="submit" 
+                            disabled={isLoading}
+                            style={{width: '100%', padding: '0.625rem 1rem', marginTop: '0.5rem', fontSize: '0.875rem', fontWeight: 600, color: 'white', backgroundColor: isLoading ? '#9CA3AF' : '#004B8D', border: 'none', borderRadius: '0.375rem', cursor: isLoading ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', transition: 'all 0.2s ease', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif'}}
+                        >
+                            {isLoading ? <Loader2 style={{height: '1rem', width: '1rem', animation: 'spin 1s linear infinite'}} /> : <UserPlus style={{height: '1rem', width: '1rem'}} />}
                             Create Account
-                        </Button>
+                        </button>
                     </form>
-                    </CardContent>
-                    <CardFooter className="justify-center text-sm pt-6">
-                        {/* Removed signup link for invite-only */}
-                    </CardFooter>
-                </Card>
+                </div>
             )}
         </div>
-         <p className="text-center text-sm text-muted-foreground mt-8">
+
+        {/* Footer */}
+        <p style={{textAlign: 'center', fontSize: '0.875rem', color: '#6B7280', marginTop: '2rem', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif'}}>
             &copy; {new Date().getFullYear()} Pryysm by 3D Prodigy.
         </p>
+
+        <style>{`
+            @keyframes spin {
+                to { transform: rotate(360deg); }
+            }
+        `}</style>
     </div>
   )
 }
