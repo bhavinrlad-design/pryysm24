@@ -49,11 +49,15 @@ export default function LoginPage() {
             console.log('📊 Demo login result:', success);
             
             if (success) {
-                console.log('✅ Demo login successful!');
+                console.log('✅ Demo login successful! Waiting for navigation...');
                 toast({
                     title: 'Welcome, Demo User!',
                     description: 'You are now exploring the app with sample data.',
                 });
+                // Wait for navigation to complete before resetting
+                setTimeout(() => {
+                    setIsDemoLoading(false);
+                }, 500);
             } else {
                 console.log('❌ Demo login returned false');
                 toast({
