@@ -108,19 +108,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const navigateAfterLogin = (loggedInUser: User | null) => {
          if (loggedInUser) {
             console.log('✅ navigateAfterLogin - User logged in:', loggedInUser.email, 'Role:', loggedInUser.role);
-            console.log('🔄 About to call router.push()');
-            try {
-                if (loggedInUser.role === 'master') {
-                    console.log('🔄 Redirecting to master-admin');
-                    router.push('/master-admin');
-                } else {
-                    console.log('🔄 Redirecting to dashboard');
-                    router.push('/dashboard');
+            console.log('🔄 Scheduling navigation with 150ms delay to ensure state update');
+            
+            // CRITICAL: Must delay to ensure React state updates propagate before navigation
+            // ProtectedRoute checks isAuthenticated which depends on state being updated
+            setTimeout(() => {
+                console.log('🔄 Delay complete, now calling router.push()');
+                try {
+                    if (loggedInUser.role === 'master') {
+                        console.log('🔄 Redirecting to master-admin');
+                        router.push('/master-admin');
+                    } else {
+                        console.log('🔄 Redirecting to dashboard');
+                        router.push('/dashboard');
+                    }
+                    console.log('✅ router.push() called successfully');
+                } catch (err) {
+                    console.error('❌ Error calling router.push:', err);
                 }
-                console.log('✅ router.push() called successfully');
-            } catch (err) {
-                console.error('❌ Error calling router.push:', err);
-            }
+            }, 150);
             return true;
         }
         console.log('❌ navigateAfterLogin - No user provided');
