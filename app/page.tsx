@@ -1,6 +1,6 @@
 'use client';
 
-import { Calculator, CheckCircle2, GanttChartSquare, Layers, Workflow, Cpu, FileText } from "lucide-react";
+import { Calculator, CheckCircle2, GanttChartSquare, Workflow, Cpu, FileText } from "lucide-react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -9,7 +9,18 @@ export default function LandingPage() {
     <div style={{display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: 'white', color: '#1f2937', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif'}}>
       <header style={{padding: '0 1.5rem', height: '4rem', display: 'flex', alignItems: 'center', boxShadow: '0 1px 2px rgba(0,0,0,0.05)', position: 'sticky', top: 0, zIndex: 50, backgroundColor: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(8px)', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif'}}>
         <Link href="#" style={{display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', color: 'inherit'}} prefetch={false}>
-          <Layers style={{height: '2rem', width: '2rem', color: '#EAB308'}} />
+          <div style={{height: '2.5rem', width: '2.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '0.375rem', backgroundColor: '#004B8D', padding: '0.25rem'}}>
+            <svg viewBox="0 0 100 100" style={{width: '100%', height: '100%'}} xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="logoGradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style={{stopColor: '#E6A635', stopOpacity: 1}} />
+                  <stop offset="100%" style={{stopColor: '#FFD966', stopOpacity: 1}} />
+                </linearGradient>
+              </defs>
+              <path d="M 30 20 L 30 80 L 50 80 Q 65 80 65 65 Q 65 50 50 50 L 30 50" stroke="url(#logoGradient2)" strokeWidth="8" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+              <circle cx="55" cy="70" r="4" fill="url(#logoGradient2)" />
+            </svg>
+          </div>
           <span style={{marginLeft: '0.5rem', fontSize: '1.25rem', fontWeight: 700, color: '#004B8D', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif'}}>
             Pryysm <span style={{fontSize: '0.875rem', fontWeight: 500, color: '#6B7280', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif'}}>by 3D Prodigy</span>
           </span>
