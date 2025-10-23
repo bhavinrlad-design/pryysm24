@@ -1,6 +1,10 @@
 
+// Use SQLite for local development, SQL Server for production
+// In .env.local, use: DATABASE_URL="file:./prisma/dev.db"
+// In .env.production, use: DATABASE_URL="sqlserver://..."
+
 datasource db {
-  provider = "sqlserver"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
