@@ -42,17 +42,27 @@ export default function LoginPage() {
     
     const handleDemoLogin = async () => {
         setIsDemoLoading(true);
-        const success = await loginWithEmail('demo@prysm.com', 'demo123');
-        if (success) {
-            toast({
-                title: 'Welcome, Demo User!',
-                description: 'You are now exploring the app with sample data.',
-            });
-        } else {
+        try {
+            const success = await loginWithEmail('demo@prysm.com', 'demo123');
+            if (success) {
+                toast({
+                    title: 'Welcome, Demo User!',
+                    description: 'You are now exploring the app with sample data.',
+                });
+            } else {
+                toast({
+                    variant: 'destructive',
+                    title: 'Demo Login Failed',
+                    description: 'Could not sign in as demo user. Please try again.',
+                });
+                setIsDemoLoading(false);
+            }
+        } catch (error) {
+            console.error('Demo login error:', error);
             toast({
                 variant: 'destructive',
-                title: 'Demo Login Failed',
-                description: 'Could not sign in as demo user. Please try again.',
+                title: 'Demo Login Error',
+                description: 'An error occurred during login. Please try again.',
             });
             setIsDemoLoading(false);
         }
@@ -147,7 +157,7 @@ export default function LoginPage() {
                     type="button" 
                     onClick={handleDemoLogin}
                     disabled={isLoading || isDemoLoading}
-                    style={{width: '100%', padding: '0.625rem 1rem', fontSize: '0.875rem', fontWeight: 600, color: '#004B8D', backgroundColor: 'white', border: '1px solid #004B8D', borderRadius: '0.375rem', cursor: isLoading || isDemoLoading ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', transition: 'all 0.2s ease', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif'}}
+                    style={{width: '100%', padding: '0.625rem 1rem', fontSize: '0.875rem', fontWeight: 600, color: isLoading || isDemoLoading ? '#9CA3AF' : '#004B8D', backgroundColor: 'white', border: `1px solid ${isLoading || isDemoLoading ? '#D1D5DB' : '#004B8D'}`, borderRadius: '0.375rem', cursor: isLoading || isDemoLoading ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', transition: 'all 0.2s ease', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif', opacity: isLoading || isDemoLoading ? 0.6 : 1}}
                 >
                     {isDemoLoading ? <Loader2 style={{height: '1rem', width: '1rem', animation: 'spin 1s linear infinite'}} /> : <UserCheck style={{height: '1rem', width: '1rem'}} />}
                     Sign in as Demo User
