@@ -4,207 +4,81 @@ import { Button } from "@/components/ui/button";
 import { Calculator, CheckCircle2, GanttChartSquare, Layers, Workflow, Cpu, FileText } from "lucide-react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Check } from 'lucide-react';
-
 
 export default function LandingPage() {
-  
   return (
-    <div className="flex flex-col min-h-screen bg-white text-gray-800" style={{display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: 'white', color: '#1f2937'}}>
-      <header className="px-4 lg:px-6 h-16 flex items-center shadow-sm sticky top-0 z-50 bg-white/80 backdrop-blur-sm" style={{padding: '0 1.5rem', height: '4rem', display: 'flex', alignItems: 'center', boxShadow: '0 1px 2px rgba(0,0,0,0.05)', position: 'sticky', top: 0, zIndex: 50, backgroundColor: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(8px)'}}>
-        <Link href="#" className="flex items-center justify-center" prefetch={false}>
-          <Layers className="h-8 w-8 text-yellow-500" />
-          <span className="ml-2 text-xl font-bold text-primary">
-            Pryysm <span className="text-sm font-medium text-gray-500">by 3D Prodigy</span>
+    <div style={{display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: 'white', color: '#1f2937'}}>
+      <header style={{padding: '0 1.5rem', height: '4rem', display: 'flex', alignItems: 'center', boxShadow: '0 1px 2px rgba(0,0,0,0.05)', position: 'sticky', top: 0, zIndex: 50, backgroundColor: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(8px)'}}>
+        <Link href="#" style={{display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none', color: 'inherit'}} prefetch={false}>
+          <Layers style={{height: '2rem', width: '2rem', color: '#EAB308'}} />
+          <span style={{marginLeft: '0.5rem', fontSize: '1.25rem', fontWeight: 'bold', color: '#004B8D'}}>
+            Pryysm <span style={{fontSize: '0.875rem', fontWeight: 500, color: '#6B7280'}}>by 3D Prodigy</span>
           </span>
         </Link>
-        <nav className="ml-auto flex gap-4 sm:gap-6 items-center">
-          <Link href="#features" className="text-sm font-medium hover:text-primary" prefetch={false}>
-            Features
-          </Link>
-          <Link href="#contact" className="text-sm font-medium hover:text-primary" prefetch={false}>
-            Contact
-          </Link>
-          <Button asChild variant="secondary">
-            <Link href="https://calendly.com/bhavin-lad-3d-prodigy/pryysm-demo" target="_blank" rel="noopener noreferrer">
-              Book Demo
-            </Link>
-          </Button>
-          <Button asChild>
-            <Link href="/login">Login</Link>
-          </Button>
+        <nav style={{marginLeft: 'auto', display: 'flex', gap: '1rem', alignItems: 'center'}}>
+          <Link href="#features" style={{fontSize: '0.875rem', fontWeight: 500, color: '#4B5563', textDecoration: 'none'}} prefetch={false}>Features</Link>
+          <Link href="#contact" style={{fontSize: '0.875rem', fontWeight: 500, color: '#4B5563', textDecoration: 'none'}} prefetch={false}>Contact</Link>
+          <Button asChild variant="secondary"><Link href="https://calendly.com/bhavin-lad-3d-prodigy/pryysm-demo" target="_blank" rel="noopener noreferrer">Book Demo</Link></Button>
+          <Button asChild><Link href="/login">Login</Link></Button>
         </nav>
       </header>
-
-      <main className="flex-1" style={{flex: '1'}}>
-        {/* Hero Section */}
-        <section className="w-full pt-24 pb-32 md:pt-32 md:pb-40 text-center overflow-hidden bg-white" style={{width: '100%', paddingTop: '6rem', paddingBottom: '8rem', backgroundColor: 'white', textAlign: 'center'}}>
-          <div className="container px-4 md:px-6 relative z-10" style={{maxWidth: '1280px', margin: '0 auto', padding: '0 1.5rem', position: 'relative', zIndex: 10}}>
-            <div className="flex flex-col items-center space-y-6">
-                <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl leading-snug bg-clip-text text-transparent bg-gradient-to-br from-gray-900 via-primary to-accent mb-6 pb-2">
-                  Revolutionize Your 3D Printing Operation
-                </h1>
-                
-                <p className="max-w-[700px] text-gray-600 md:text-xl mx-auto">
-                  Pryysm is the all-in-one, intelligent platform designed to bring clarity, efficiency, and powerful automation to your 3D printing farm.
-                </p>
-            </div>
+      <main style={{flex: '1'}}>
+        <section style={{width: '100%', paddingTop: '6rem', paddingBottom: '8rem', textAlign: 'center', backgroundColor: 'white'}}>
+          <div style={{maxWidth: '1280px', margin: '0 auto', padding: '0 1.5rem'}}>
+            <h1 style={{fontSize: 'clamp(1.875rem, 8vw, 3.5rem)', fontWeight: 700, backgroundImage: 'linear-gradient(135deg, #1f2937 0%, #004B8D 50%, #E6A635 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', marginBottom: '1.5rem'}}>Revolutionize Your 3D Printing Operation</h1>
+            <p style={{maxWidth: '44rem', color: '#4B5563', fontSize: '1.125rem', margin: '0 auto', lineHeight: 1.5}}>Pryysm is the all-in-one, intelligent platform designed to bring clarity, efficiency, and powerful automation to your 3D printing farm.</p>
           </div>
         </section>
-
-        {/* Features Section */}
-        <section id="features" className="w-full py-12 md:py-24 lg:py-32 bg-gray-50" style={{width: '100%', padding: '3rem 0', backgroundColor: '#F9FAFB'}}>
-          <div className="container px-4 md:px-6" style={{maxWidth: '1280px', margin: '0 auto', padding: '0 1.5rem'}}>
-            <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl text-gray-900">A Smarter Way to Print</h2>
-              <p className="max-w-[900px] text-gray-600 md:text-xl/relaxed">
-                From intelligent scheduling to complete financial oversight, Pryysm is the unified OS your 3D printing farm needs to scale efficiently.
-              </p>
+        <section id="features" style={{width: '100%', padding: '3rem 0', backgroundColor: '#F9FAFB'}}>
+          <div style={{maxWidth: '1280px', margin: '0 auto', padding: '0 1.5rem'}}>
+            <div style={{textAlign: 'center', marginBottom: '3rem'}}>
+              <h2 style={{fontSize: '2rem', fontWeight: 700, color: '#111827', marginBottom: '1rem'}}>A Smarter Way to Print</h2>
+              <p style={{color: '#4B5563', fontSize: '1.125rem', lineHeight: 1.6}}>From intelligent scheduling to complete financial oversight, Pryysm is the unified OS your 3D printing farm needs to scale efficiently.</p>
             </div>
-            <div className="mx-auto grid max-w-5xl items-start gap-8 sm:grid-cols-1 md:gap-12 lg:max-w-none lg:grid-cols-3">
-              {/* Feature 1: AI Scheduling */}
-              <Card className="flex flex-col">
-                <CardHeader>
-                  <div className="flex items-center gap-4">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-                      <Cpu className="h-6 w-6 text-primary" />
-                    </div>
-                    <CardTitle>AI-Powered Scheduling</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent className="flex-1">
-                  <p className="text-muted-foreground">
-                    Our intelligent AI scheduler analyzes your entire fleet, job requirements, and deadlines to find the absolute optimal production plan.
-                  </p>
-                  <ul className="mt-4 space-y-3 text-sm">
-                    <li className="flex items-start gap-3">
-                      <CheckCircle2 className="h-5 w-5 mt-0.5 text-primary flex-shrink-0" />
-                      <span>Automatically find the most efficient slot for any job.</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <CheckCircle2 className="h-5 w-5 mt-0.5 text-primary flex-shrink-0" />
-                      <span>Maximize printer utilization and reduce idle time.</span>
-                    </li>
-                  </ul>
-                </CardContent>
+            <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem', maxWidth: '64rem', margin: '0 auto'}}>
+              <Card style={{display: 'flex', flexDirection: 'column', backgroundColor: 'white', border: '1px solid #E5E7EB', padding: '1.5rem'}}>
+                <div style={{display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem'}}>
+                  <Cpu style={{height: '1.5rem', width: '1.5rem', color: '#004B8D'}} />
+                  <CardTitle>AI-Powered Scheduling</CardTitle>
+                </div>
+                <p style={{color: '#4B5563', lineHeight: 1.6, fontSize: '0.95rem'}}>Our intelligent AI scheduler analyzes your entire fleet, job requirements, and deadlines to find the absolute optimal production plan.</p>
               </Card>
-
-              {/* Feature 2: Visual Workflow */}
-              <Card className="flex flex-col">
-                <CardHeader>
-                  <div className="flex items-center gap-4">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-                      <Workflow className="h-6 w-6 text-primary" />
-                    </div>
-                    <CardTitle>Visual Project Tracking</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent className="flex-1">
-                  <p className="text-muted-foreground">
-                    Ditch confusing spreadsheets. Our intuitive Kanban-style board gives you a complete visual overview of every project in your pipeline.
-                  </p>
-                  <ul className="mt-4 space-y-3 text-sm">
-                    <li className="flex items-start gap-3">
-                      <CheckCircle2 className="h-5 w-5 mt-0.5 text-primary flex-shrink-0" />
-                      <span>Track projects from order to dispatch in one view.</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <CheckCircle2 className="h-5 w-5 mt-0.5 text-primary flex-shrink-0" />
-                      <span>Get instant insights into bottlenecks and resource allocation.</span>
-                    </li>
-                  </ul>
-                </CardContent>
+              <Card style={{display: 'flex', flexDirection: 'column', backgroundColor: 'white', border: '1px solid #E5E7EB', padding: '1.5rem'}}>
+                <div style={{display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem'}}>
+                  <Workflow style={{height: '1.5rem', width: '1.5rem', color: '#004B8D'}} />
+                  <CardTitle>Visual Project Tracking</CardTitle>
+                </div>
+                <p style={{color: '#4B5563', lineHeight: 1.6, fontSize: '0.95rem'}}>Our intuitive Kanban-style board gives you a complete visual overview of every project in your pipeline.</p>
               </Card>
-
-              {/* Feature 3: Financial Hub */}
-              <Card className="flex flex-col">
-                <CardHeader>
-                  <div className="flex items-center gap-4">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-                      <FileText className="h-6 w-6 text-primary" />
-                    </div>
-                    <CardTitle>Integrated Financial Hub</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent className="flex-1">
-                  <p className="text-muted-foreground">
-                    From precise job costing to professional invoicing, Pryysm integrates your finances directly into your workflow to ensure profitability.
-                  </p>
-                  <ul className="mt-4 space-y-3 text-sm">
-                    <li className="flex items-start gap-3">
-                      <CheckCircle2 className="h-5 w-5 mt-0.5 text-primary flex-shrink-0" />
-                      <span>Calculate exact job costs, including materials and labor.</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <CheckCircle2 className="h-5 w-5 mt-0.5 text-primary flex-shrink-0" />
-                      <span>Generate and send professional quotes and invoices in minutes.</span>
-                    </li>
-                  </ul>
-                </CardContent>
+              <Card style={{display: 'flex', flexDirection: 'column', backgroundColor: 'white', border: '1px solid #E5E7EB', padding: '1.5rem'}}>
+                <div style={{display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem'}}>
+                  <FileText style={{height: '1.5rem', width: '1.5rem', color: '#004B8D'}} />
+                  <CardTitle>Integrated Financial Hub</CardTitle>
+                </div>
+                <p style={{color: '#4B5563', lineHeight: 1.6, fontSize: '0.95rem'}}>Pryysm integrates your finances directly into your workflow to ensure profitability.</p>
               </Card>
             </div>
           </div>
         </section>
-        
-        {/* Core Pillars Section */}
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-white" style={{width: '100%', padding: '3rem 0', backgroundColor: 'white'}}>
-          <div className="container px-4 md:px-6" style={{maxWidth: '1280px', margin: '0 auto', padding: '0 1.5rem'}}>
-            <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl text-gray-900">The Unified Platform for Manufacturing</h2>
-            </div>
-            <div className="mx-auto grid max-w-5xl items-start gap-8 sm:grid-cols-2 md:gap-12 lg:max-w-none lg:grid-cols-3">
-              <div className="grid gap-2 p-6 rounded-lg hover:bg-gray-100 transition-colors">
-                <Workflow className="h-8 w-8 text-primary" />
-                <h3 className="text-lg font-bold">Total Workflow Control</h3>
-                <p className="text-sm text-gray-600">Manage your entire production pipeline visually. Track every project from order to dispatch on an intuitive Kanban board and eliminate operational blind spots.</p>
-              </div>
-              <div className="grid gap-2 p-6 rounded-lg hover:bg-gray-100 transition-colors">
-                <GanttChartSquare className="h-8 w-8 text-primary" />
-                <h3 className="text-lg font-bold">Intelligent Resource Planning</h3>
-                <p className="text-sm text-gray-600">Leverage AI to automate scheduling, maximize printer uptime, and receive intelligent reorder alerts for materials before you run out. Turn your farm into a self-optimizing ecosystem.</p>
-              </div>
-              <div className="grid gap-2 p-6 rounded-lg hover:bg-gray-100 transition-colors">
-                <Calculator className="h-8 w-8 text-primary" />
-                <h3 className="text-lg font-bold">Integrated Financial Hub</h3>
-                <p className="text-sm text-gray-600">From precise job costing that ensures profitability to generating professional quotations and invoices, manage all your finances without leaving the platform.</p>
-              </div>
+        <section style={{width: '100%', padding: '3rem 0', backgroundColor: 'white'}}>
+          <div style={{maxWidth: '1280px', margin: '0 auto', padding: '0 1.5rem'}}>
+            <h2 style={{fontSize: '2rem', fontWeight: 700, color: '#111827', textAlign: 'center', marginBottom: '3rem'}}>The Unified Platform for Manufacturing</h2>
+            <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem', maxWidth: '64rem', margin: '0 auto'}}>
+              <div style={{padding: '1.5rem'}}><Workflow style={{height: '2rem', width: '2rem', color: '#004B8D', marginBottom: '0.5rem'}} /><h3 style={{fontWeight: 'bold', color: '#111827', marginBottom: '0.5rem'}}>Total Workflow Control</h3><p style={{fontSize: '0.875rem', color: '#4B5563'}}>Manage your entire production pipeline visually. Track every project from order to dispatch.</p></div>
+              <div style={{padding: '1.5rem'}}><GanttChartSquare style={{height: '2rem', width: '2rem', color: '#004B8D', marginBottom: '0.5rem'}} /><h3 style={{fontWeight: 'bold', color: '#111827', marginBottom: '0.5rem'}}>Intelligent Resource Planning</h3><p style={{fontSize: '0.875rem', color: '#4B5563'}}>Leverage AI to automate scheduling and maximize printer uptime.</p></div>
+              <div style={{padding: '1.5rem'}}><Calculator style={{height: '2rem', width: '2rem', color: '#004B8D', marginBottom: '0.5rem'}} /><h3 style={{fontWeight: 'bold', color: '#111827', marginBottom: '0.5rem'}}>Integrated Financial Hub</h3><p style={{fontSize: '0.875rem', color: '#4B5563'}}>Manage all your finances without leaving the platform.</p></div>
             </div>
           </div>
         </section>
-
       </main>
-      <footer id="contact" className="bg-gray-100 text-gray-600 py-12" style={{backgroundColor: '#F3F4F6', color: '#4B5563', padding: '3rem 0'}}>
-        <div className="container grid grid-cols-2 md:grid-cols-4 gap-8">
-            <div>
-                <h3 className="font-semibold text-gray-900 mb-4">Pryysm <span className="text-xs font-medium text-gray-500">by 3D Prodigy</span></h3>
-                <p className="text-sm">The OS for Digital Manufacturing.</p>
-            </div>
-             <div>
-                <h3 className="font-semibold text-gray-900 mb-4">Product</h3>
-                 <ul className="space-y-2 text-sm">
-                    <li><Link href="#features" className="hover:text-gray-900">Features</Link></li>
-                </ul>
-            </div>
-            <div>
-                <h3 className="font-semibold text-gray-900 mb-4">Company</h3>
-                 <ul className="space-y-2 text-sm">
-                    <li><Link href="#" className="hover:text-gray-900">About Us</Link></li>
-                    <li><Link href="#" className="hover:text-gray-900">Careers</Link></li>
-                    <li><Link href="#" className="hover:text-gray-900">Contact</Link></li>
-                </ul>
-            </div>
-             <div>
-                <h3 className="font-semibold text-gray-900 mb-4">Legal</h3>
-                 <ul className="space-y-2 text-sm">
-                    <li><Link href="#" className="hover:text-gray-900">Terms of Service</Link></li>
-                    <li><Link href="#" className="hover:text-gray-900">Privacy Policy</Link></li>
-                </ul>
-            </div>
-        </div>
-        <div className="container mt-12 pt-8 border-t border-gray-200 text-center text-sm">
-             &copy; {new Date().getFullYear()} Pryysm by 3D Prodigy. All rights reserved.
+      <footer style={{backgroundColor: '#F3F4F6', color: '#4B5563', padding: '3rem 0'}}>
+        <div style={{maxWidth: '1280px', margin: '0 auto', padding: '0 1.5rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '2rem'}}>
+          <div><h3 style={{fontWeight: 600, color: '#111827', marginBottom: '1rem'}}>Pryysm</h3><p style={{fontSize: '0.875rem'}}>The OS for Digital Manufacturing.</p></div>
+          <div><h3 style={{fontWeight: 600, color: '#111827', marginBottom: '1rem'}}>Product</h3><Link href="#features" style={{color: '#004B8D', textDecoration: 'none', fontSize: '0.875rem', display: 'block'}}>Features</Link></div>
+          <div><h3 style={{fontWeight: 600, color: '#111827', marginBottom: '1rem'}}>Company</h3><Link href="#" style={{color: '#4B5563', textDecoration: 'none', fontSize: '0.875rem', display: 'block'}}>About Us</Link><Link href="#" style={{color: '#4B5563', textDecoration: 'none', fontSize: '0.875rem', display: 'block'}}>Careers</Link></div>
+          <div><h3 style={{fontWeight: 600, color: '#111827', marginBottom: '1rem'}}>Legal</h3><Link href="#" style={{color: '#4B5563', textDecoration: 'none', fontSize: '0.875rem', display: 'block'}}>Terms</Link></div>
         </div>
       </footer>
     </div>
-  )
+  );
 }
