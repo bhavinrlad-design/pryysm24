@@ -105,22 +105,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setIsLoading(false);
     }, []);
     
-    const navigateAfterLogin = async (loggedInUser: User | null) => {
+    const navigateAfterLogin = (loggedInUser: User | null) => {
          if (loggedInUser) {
             console.log('✅ navigateAfterLogin - User logged in:', loggedInUser.email, 'Role:', loggedInUser.role);
-            // Use a small timeout to ensure state is updated before navigation
-            return new Promise<boolean>((resolve) => {
-                setTimeout(() => {
-                    if (loggedInUser.role === 'master') {
-                        console.log('🔄 Redirecting to master-admin');
-                        router.push('/master-admin');
-                    } else {
-                        console.log('🔄 Redirecting to dashboard');
-                        router.push('/dashboard');
-                    }
-                    resolve(true);
-                }, 100);
-            });
+            console.log('🔄 About to call router.push()');
+            try {
+                if (loggedInUser.role === 'master') {
+                    console.log('🔄 Redirecting to master-admin');
+                    router.push('/master-admin');
+                } else {
+                    console.log('🔄 Redirecting to dashboard');
+                    router.push('/dashboard');
+                }
+                console.log('✅ router.push() called successfully');
+            } catch (err) {
+                console.error('❌ Error calling router.push:', err);
+            }
+            return true;
         }
         console.log('❌ navigateAfterLogin - No user provided');
         return false;
@@ -137,7 +138,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 ...rest 
             });
             localStorage.setItem('new_signup', 'true');
-            return await navigateAfterLogin(appUser);
+            return navigateAfterLogin(appUser);
         } catch (error) {
             console.error("Signup Error:", error);
             return false;
@@ -153,7 +154,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const userToLogin: User = { name: 'Demo User', email, role: 'admin' };
             const result = handleUser(userToLogin);
             console.log('✅ handleUser returned:', result);
-            const navigateResult = await navigateAfterLogin(result);
+            const navigateResult = navigateAfterLogin(result);
             console.log('✅ navigateAfterLogin result:', navigateResult);
             return navigateResult;
         }
@@ -161,13 +162,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if ((email === 'LAD@PRYYSM' && pass === 'Lad@1234') || (email === 'LAD@admin.com' && pass === 'Lad123')) {
             console.log('✅ LAD master user credentials matched');
             const userToLogin: User = { name: 'LAD', email, role: 'master' };
-            return await navigateAfterLogin(handleUser(userToLogin));
+            return navigateAfterLogin(handleUser(userToLogin));
         }
         
         if (email === 'admin@prysm.com' && pass === 'Lad123') {
             console.log('✅ Admin user credentials matched');
             const userToLogin: User = { name: 'Admin User', email, role: 'admin' };
-            return await navigateAfterLogin(handleUser(userToLogin));
+            return navigateAfterLogin(handleUser(userToLogin));
         }
 
         // Simple email/password login (for development)
@@ -180,7 +181,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 role: 'admin' 
             };
             const loggedInUser = handleUser(userToLogin);
-            return await navigateAfterLogin(loggedInUser);
+            return navigateAfterLogin(loggedInUser);
         } catch (error) {
             console.error("❌ Login Error: ", error);
             return false;
