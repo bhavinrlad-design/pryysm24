@@ -1,6 +1,5 @@
 'use client';
 
-import { Button } from "@/components/ui/button";
 import { Calculator, CheckCircle2, GanttChartSquare, Layers, Workflow, Cpu, FileText } from "lucide-react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,8 +17,8 @@ export default function LandingPage() {
         <nav style={{marginLeft: 'auto', display: 'flex', gap: '1rem', alignItems: 'center'}}>
           <Link href="#features" style={{fontSize: '0.9rem', fontWeight: 500, color: '#4B5563', textDecoration: 'none', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif'}} prefetch={false}>Features</Link>
           <Link href="#contact" style={{fontSize: '0.9rem', fontWeight: 500, color: '#4B5563', textDecoration: 'none', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif'}} prefetch={false}>Contact</Link>
-          <Button asChild variant="secondary"><Link href="https://calendly.com/bhavin-lad-3d-prodigy/pryysm-demo" target="_blank" rel="noopener noreferrer">Book Demo</Link></Button>
-          <Button asChild><Link href="/login">Login</Link></Button>
+          <Link href="https://calendly.com/bhavin-lad-3d-prodigy/pryysm-demo" target="_blank" rel="noopener noreferrer" style={{display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0.5rem 1rem', fontSize: '0.875rem', fontWeight: 600, color: '#004B8D', backgroundColor: 'white', border: '1px solid #004B8D', borderRadius: '0.375rem', textDecoration: 'none', cursor: 'pointer', transition: 'all 0.2s ease', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif'}}>Book Demo</Link>
+          <Link href="/login" style={{display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0.5rem 1rem', fontSize: '0.875rem', fontWeight: 600, color: 'white', backgroundColor: '#004B8D', border: '1px solid #004B8D', borderRadius: '0.375rem', textDecoration: 'none', cursor: 'pointer', transition: 'all 0.2s ease', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif'}}>Login</Link>
         </nav>
       </header>
       <main style={{flex: '1', fontFamily: 'Roboto, system-ui, -apple-system, sans-serif'}}>
