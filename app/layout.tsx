@@ -8,6 +8,9 @@ import { WorkspaceProvider } from '@/providers/workspace-provider';
 export const metadata: Metadata = {
   title: 'Pryysm by 3D Prodigy',
   description: '3D Printing Farm Dashboard',
+  icons: {
+    icon: '/favicon.svg',
+  },
 };
 
 export default function RootLayout({
