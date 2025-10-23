@@ -41,28 +41,34 @@ export default function LoginPage() {
     }
     
     const handleDemoLogin = async () => {
+        console.log('🔘 Demo button clicked');
         setIsDemoLoading(true);
         try {
+            console.log('🔐 Attempting demo login...');
             const success = await loginWithEmail('demo@prysm.com', 'demo123');
+            console.log('📊 Demo login result:', success);
+            
             if (success) {
+                console.log('✅ Demo login successful!');
                 toast({
                     title: 'Welcome, Demo User!',
                     description: 'You are now exploring the app with sample data.',
                 });
             } else {
+                console.log('❌ Demo login returned false');
                 toast({
                     variant: 'destructive',
                     title: 'Demo Login Failed',
-                    description: 'Could not sign in as demo user. Please try again.',
+                    description: 'Could not sign in as demo user. Check console for details.',
                 });
                 setIsDemoLoading(false);
             }
         } catch (error) {
-            console.error('Demo login error:', error);
+            console.error('❌ Demo login error:', error);
             toast({
                 variant: 'destructive',
                 title: 'Demo Login Error',
-                description: 'An error occurred during login. Please try again.',
+                description: 'An error occurred during login. Check console for details.',
             });
             setIsDemoLoading(false);
         }
