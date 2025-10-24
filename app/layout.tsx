@@ -3,7 +3,7 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from '@/hooks/use-auth';
 // Import the WorkspaceProvider - must match the context used by useWorkspace hook
-import { WorkspaceProvider } from '@/hooks/use-workspace';
+import { WorkspaceProvider } from '@/hooks/workspace';
 
 export const metadata: Metadata = {
   title: 'Pryysm by 3D Prodigy',
