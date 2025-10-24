@@ -1,11 +1,11 @@
 
-// Use SQL Server for both local development and production
-// Prisma provider must match the DATABASE_URL connection string
-// For local development with SQL Server: Use LocalDB or SQL Server Express
-// For production on Azure: Use Azure SQL Server (provided via GitHub Secret)
+// Database provider can be:
+// - "sqlite" for local development (DATABASE_URL="file:./prisma/dev.db")
+// - "sqlserver" for production on Azure (DATABASE_URL from GitHub Secret)
+// See .env.local for development, .env.production for production
 
 datasource db {
-  provider = "sqlserver"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -40,12 +40,12 @@ model Account {
   type               String
   provider           String
   providerAccountId  String
-  refresh_token      String?  @db.Text
-  access_token       String?  @db.Text
+  refresh_token      String?
+  access_token       String?
   expires_at         Int?
   token_type         String?
   scope              String?
-  id_token           String?  @db.Text
+  id_token           String?
   session_state      String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
