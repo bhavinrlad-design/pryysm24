@@ -7,12 +7,20 @@
 
 const http = require('http');
 const url = require('url');
+const { initializeDatabase } = require('./lib/db-init');
 
 const port = parseInt(process.env.PORT, 10) || 8080;
 const now = () => new Date().toISOString();
 
 console.log(`[${now()}] Starting SYNC server...`);
 const startTime = Date.now();
+
+// Initialize database before loading Next.js
+(async () => {
+  await initializeDatabase();
+})().catch(err => {
+  console.error(`[${now()}] Database initialization warning:`, err.message);
+});
 
 // Load Next.js synchronously (will block for ~100 seconds)
 let nextHandler = null;

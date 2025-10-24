@@ -28,6 +28,16 @@ jobs:
           npm install
           npm run build --if-present
           npm run test --if-present
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
+          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+
+      - name: Run Prisma migrations
+        run: |
+          npx prisma db push --skip-generate --skip-seed
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
