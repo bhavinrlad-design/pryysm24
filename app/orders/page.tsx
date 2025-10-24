@@ -1,7 +1,7 @@
 
 import { AppLayout } from "@/components/layout/app-layout"
-// Import the simplified version
-import OrdersClient from "@/components/orders/orders-client-simple"
+// Import the full Orders component  
+import { OrdersClient } from "@/components/orders/orders-client"
 
 export default function OrdersPage() {
   return (
