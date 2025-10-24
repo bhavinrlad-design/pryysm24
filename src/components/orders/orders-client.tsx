@@ -77,7 +77,7 @@ export function OrdersClient() {
   return (
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between mb-6">
-        <OrdersHeader />
+        <OrdersHeader onNewOrderClick={() => setShowNewOrderForm(true)} />
         <Button onClick={() => setShowNewOrderForm(true)} className="ml-auto">
           <PlusCircle className="mr-2 h-4 w-4" /> New Order
         </Button>

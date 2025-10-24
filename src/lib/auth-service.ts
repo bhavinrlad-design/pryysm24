@@ -70,6 +70,10 @@ export async function authenticateUser(
       return { success: false, error: 'User not found' };
     }
 
+    if (!userWithPassword.passwordHash) {
+      return { success: false, error: 'User has no password set' };
+    }
+
     // Verify password
     const isPasswordValid = await verifyPassword(password, userWithPassword.passwordHash);
 
