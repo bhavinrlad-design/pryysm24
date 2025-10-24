@@ -2,8 +2,8 @@ import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from '@/hooks/use-auth';
-// Import the WorkspaceProvider from our new file
-import { WorkspaceProvider } from '@/providers/workspace-provider';
+// Import the WorkspaceProvider - must match the context used by useWorkspace hook
+import { WorkspaceProvider } from '@/hooks/use-workspace';
 
 export const metadata: Metadata = {
   title: 'Pryysm by 3D Prodigy',
