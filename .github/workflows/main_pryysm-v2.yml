@@ -35,7 +35,7 @@ jobs:
 
       - name: Run Prisma migrations
         run: |
-          npx prisma db push --skip-generate --skip-seed
+          npx prisma db push --skip-generate
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
