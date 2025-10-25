@@ -1,6 +1,11 @@
--- Disable constraints on existing tables
-IF OBJECT_ID('[Session]', 'U') IS NOT NULL ALTER TABLE [Session] NOCHECK CONSTRAINT ALL;
-IF OBJECT_ID('[Account]', 'U') IS NOT NULL ALTER TABLE [Account] NOCHECK CONSTRAINT ALL;
+-- Drop all foreign key constraints referencing User table
+DECLARE @sql NVARCHAR(MAX) = '';
+SELECT @sql += 'ALTER TABLE ' + QUOTENAME(TABLE_NAME) + ' DROP CONSTRAINT ' + QUOTENAME(CONSTRAINT_NAME) + ';'
+FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS
+WHERE UNIQUE_CONSTRAINT_NAME = 'PK_User';
+
+IF @sql != ''
+    EXEC sp_executesql @sql;
 
 -- Drop existing tables if they exist
 DROP TABLE IF EXISTS [Session];
