@@ -58,7 +58,7 @@ VALUES
 
 -- Verify
 PRINT 'Tables created successfully!';
-SELECT 'User table' as TableName, COUNT(*) as RowCount FROM [User]
+SELECT 'User table' as [TableName], COUNT(*) as [RowCount] FROM [User]
 UNION ALL
 SELECT 'Account table', COUNT(*) FROM [Account]
 UNION ALL
