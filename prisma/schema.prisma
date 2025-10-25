@@ -5,9 +5,16 @@
 // See .env.local for development, .env.production for production
 
 datasource db {
-  provider = "sqlite"
+  provider = "sqlserver"
   url      = env("DATABASE_URL")
 }
+
+// IMPORTANT: When deploying locally with SQLite:
+// Uncomment this block and comment out sqlserver above
+// datasource db {
+//   provider = "sqlite"
+//   url      = env("DATABASE_URL")
+// }
 
 generator client {
   provider = "prisma-client-js"
