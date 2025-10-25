@@ -1,3 +1,7 @@
+-- Disable constraints on existing tables
+IF OBJECT_ID('[Session]', 'U') IS NOT NULL ALTER TABLE [Session] NOCHECK CONSTRAINT ALL;
+IF OBJECT_ID('[Account]', 'U') IS NOT NULL ALTER TABLE [Account] NOCHECK CONSTRAINT ALL;
+
 -- Drop existing tables if they exist
 DROP TABLE IF EXISTS [Session];
 DROP TABLE IF EXISTS [Account];
