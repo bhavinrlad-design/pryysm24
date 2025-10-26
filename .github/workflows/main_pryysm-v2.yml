@@ -70,4 +70,32 @@ jobs:
           app-name: 'PRYYSM-V2'
           slot-name: 'Production'
           package: .
+
+      - name: 'Set App Settings'
+        uses: azure/appservice-settings@v1
+        with:
+          app-name: 'PRYYSM-V2'
+          app-settings-json: |
+            [
+              {
+                "name": "DATABASE_URL",
+                "value": "${{ secrets.DATABASE_URL }}",
+                "slotSetting": false
+              },
+              {
+                "name": "NEXTAUTH_URL",
+                "value": "${{ secrets.NEXTAUTH_URL }}",
+                "slotSetting": false
+              },
+              {
+                "name": "NEXTAUTH_SECRET",
+                "value": "${{ secrets.NEXTAUTH_SECRET }}",
+                "slotSetting": false
+              },
+              {
+                "name": "NODE_ENV",
+                "value": "production",
+                "slotSetting": false
+              }
+            ]
           
