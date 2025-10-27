@@ -12,8 +12,12 @@ function getPrisma() {
   return prisma
 }
 
+function getPrismaAdapter() {
+  return PrismaAdapter(getPrisma())
+}
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  adapter: PrismaAdapter(getPrisma()),
+  adapter: getPrismaAdapter(),
   providers: [
     AzureADProvider({
       clientId: process.env.AZURE_AD_CLIENT_ID || "",
