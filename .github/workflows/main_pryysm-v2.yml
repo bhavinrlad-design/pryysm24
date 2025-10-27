@@ -63,6 +63,10 @@ jobs:
         with:
           app-name: 'PRYYSM-V2'
           slot-name: 'Production'
+      
+      - name: 'Restart Azure Web App'
+        run: |
+          az webapp restart --name PRYYSM-V2 --resource-group PRYYSM-V2_group
           package: .
 
       - name: 'Set App Settings'
