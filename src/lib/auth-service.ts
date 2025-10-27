@@ -4,7 +4,14 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
-const prisma = new PrismaClient();
+let prisma: PrismaClient | null = null;
+
+function getPrisma() {
+  if (!prisma) {
+    prisma = new PrismaClient();
+  }
+  return prisma;
+}
 
 export interface AuthUser {
   id: string;
@@ -34,7 +41,7 @@ export async function findUserByEmail(email: string): Promise<AuthUser | null> {
   try {
     // Note: You'll need to add User model to Prisma schema
     // This is a placeholder - adjust based on your actual User model
-    const user = await prisma.user.findUnique({
+    const user = await getPrisma().user.findUnique({
       where: { email },
       select: {
         id: true,
@@ -62,7 +69,7 @@ export async function authenticateUser(
 ): Promise<{ success: boolean; user?: any; error?: string }> {
   try {
     // Find user by email
-    const userWithPassword = await prisma.user.findUnique({
+    const userWithPassword = await getPrisma().user.findUnique({
       where: { email },
     });
 
@@ -111,7 +118,7 @@ export async function createUser(
 ): Promise<{ success: boolean; user?: AuthUser; error?: string }> {
   try {
     // Check if user already exists
-    const existingUser = await prisma.user.findUnique({
+    const existingUser = await getPrisma().user.findUnique({
       where: { email },
     });
 
@@ -123,7 +130,7 @@ export async function createUser(
     const passwordHash = await hashPassword(password);
 
     // Create user
-    const newUser = await prisma.user.create({
+    const newUser = await getPrisma().user.create({
       data: {
         email,
         passwordHash,
@@ -161,7 +168,7 @@ export async function updateUser(
   updates: Partial<AuthUser>
 ): Promise<{ success: boolean; user?: AuthUser; error?: string }> {
   try {
-    const updatedUser = await prisma.user.update({
+    const updatedUser = await getPrisma().user.update({
       where: { id },
       data: {
         name: updates.name,
