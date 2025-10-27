@@ -1,5 +1,5 @@
 node_modules
-.next
+# .next  # DEPLOY TO AZURE
 .env
 .DS_Store
 *.log
