@@ -11,11 +11,11 @@
     "lint": "eslint . --ext .ts,.tsx",
     "format": "prettier --write .",
     "tailwind:update": "npm install tailwindcss@latest postcss@latest autoprefixer@latest --save-dev",
-    "start": "node .next/standalone/server.js",
+    "start": "node index.js",
     "build:css": "postcss app/globals.css -o app/output.css",
     "azure-postbuild": "npm run build",
     "build:azure": "cross-env NODE_ENV=production next build",
-    "start:azure": "cross-env NODE_ENV=production node .next/standalone/server.js",
+    "start:azure": "cross-env NODE_ENV=production node index.js",
     "deploy:azure": "npm run build:azure && npm run start:azure"
   },
   "dependencies": {
