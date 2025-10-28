@@ -1,9 +1,11 @@
 {
-  "name": "pryysm-diagnostic",
-  "version": "1.0.0",
-  "description": "Simple diagnostic server",
-  "main": "server.js",
+  "name": "pryysm-v2-3dprint",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
-    "start": "node server.js"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "node .next/standalone/server.js",
+    "start:diagnostic": "node server.js"
   }
 }
