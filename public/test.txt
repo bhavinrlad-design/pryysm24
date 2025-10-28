@@ -1,1 +1,0 @@
-Hello from static file - if you see this, deployment is working!

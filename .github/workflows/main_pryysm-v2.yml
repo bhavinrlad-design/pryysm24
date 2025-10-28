@@ -27,17 +27,23 @@ jobs:
         run: |
           npm install
           npm run build --if-present
+          npm run test --if-present
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
           NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+
+      - name: Run Prisma migrations
+        run: |
+          npx prisma db push --skip-generate
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: node-app
           path: .
-          include-hidden-files: true
 
   deploy:
     runs-on: ubuntu-latest
@@ -63,44 +69,5 @@ jobs:
         with:
           app-name: 'PRYYSM-V2'
           slot-name: 'Production'
-      
-      - name: 'Restart Azure Web App'
-        run: az webapp restart --name PRYYSM-V2 --resource-group PRYYSM-V2_group
-
-      - name: 'Configure Startup Command'
-        run: az webapp config set --name PRYYSM-V2 --resource-group PRYYSM-V2_group --startup-file "npm start"
-
-      - name: 'Configure App Service Settings'
-        run: |
-          az webapp config set --name PRYYSM-V2 --resource-group PRYYSM-V2_group --use-32bit-worker-process false
-          az webapp config set --name PRYYSM-V2 --resource-group PRYYSM-V2_group --web-sockets-enabled true
-          az webapp config set --name PRYYSM-V2 --resource-group PRYYSM-V2_group --always-on true
-
-      - name: 'Set App Settings'
-        uses: azure/appservice-settings@v1
-        with:
-          app-name: 'PRYYSM-V2'
-          app-settings-json: |
-            [
-              {
-                "name": "DATABASE_URL",
-                "value": "${{ secrets.DATABASE_URL }}",
-                "slotSetting": false
-              },
-              {
-                "name": "NEXTAUTH_URL",
-                "value": "${{ secrets.NEXTAUTH_URL }}",
-                "slotSetting": false
-              },
-              {
-                "name": "NEXTAUTH_SECRET",
-                "value": "${{ secrets.NEXTAUTH_SECRET }}",
-                "slotSetting": false
-              },
-              {
-                "name": "NODE_ENV",
-                "value": "production",
-                "slotSetting": false
-              }
-            ]
+          package: .
           

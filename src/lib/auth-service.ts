@@ -1,17 +1,8 @@
 // Database-backed authentication service
 // This service handles user login and validation against the database
 
-import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
-
-let prisma: PrismaClient | null = null;
-
-function getPrisma() {
-  if (!prisma) {
-    prisma = new PrismaClient();
-  }
-  return prisma;
-}
+import { prisma } from './prisma';
 
 export interface AuthUser {
   id: string;
@@ -41,7 +32,7 @@ export async function findUserByEmail(email: string): Promise<AuthUser | null> {
   try {
     // Note: You'll need to add User model to Prisma schema
     // This is a placeholder - adjust based on your actual User model
-    const user = await getPrisma().user.findUnique({
+    const user = await prisma.user.findUnique({
       where: { email },
       select: {
         id: true,
@@ -68,26 +59,34 @@ export async function authenticateUser(
   password: string
 ): Promise<{ success: boolean; user?: any; error?: string }> {
   try {
+    console.log('🔐 Starting authentication for:', email);
     // Find user by email
-    const userWithPassword = await getPrisma().user.findUnique({
+    const userWithPassword = await prisma.user.findUnique({
       where: { email },
     });
 
+    console.log('👤 User found:', !!userWithPassword);
+
     if (!userWithPassword) {
+      console.log('❌ User not found:', email);
       return { success: false, error: 'User not found' };
     }
 
     if (!userWithPassword.passwordHash) {
+      console.log('❌ User has no password set');
       return { success: false, error: 'User has no password set' };
     }
 
     // Verify password
+    console.log('🔑 Verifying password...');
     const isPasswordValid = await verifyPassword(password, userWithPassword.passwordHash);
 
     if (!isPasswordValid) {
+      console.log('❌ Invalid password');
       return { success: false, error: 'Invalid password' };
     }
 
+    console.log('✅ Password valid, returning user data');
     // Return user data without password
     const user = {
       id: userWithPassword.id,
@@ -118,7 +117,7 @@ export async function createUser(
 ): Promise<{ success: boolean; user?: AuthUser; error?: string }> {
   try {
     // Check if user already exists
-    const existingUser = await getPrisma().user.findUnique({
+    const existingUser = await prisma.user.findUnique({
       where: { email },
     });
 
@@ -130,7 +129,7 @@ export async function createUser(
     const passwordHash = await hashPassword(password);
 
     // Create user
-    const newUser = await getPrisma().user.create({
+    const newUser = await prisma.user.create({
       data: {
         email,
         passwordHash,
@@ -168,7 +167,7 @@ export async function updateUser(
   updates: Partial<AuthUser>
 ): Promise<{ success: boolean; user?: AuthUser; error?: string }> {
   try {
-    const updatedUser = await getPrisma().user.update({
+    const updatedUser = await prisma.user.update({
       where: { id },
       data: {
         name: updates.name,

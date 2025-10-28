@@ -1,7 +1,8 @@
-export async function GET() {
-  // This is the simplest possible endpoint - no dependencies
-  return new Response('OK', {
-    status: 200,
-    headers: { 'Content-Type': 'text/plain' },
-  });
+import { NextRequest, NextResponse } from 'next/server';
+
+export async function GET(request: NextRequest) {
+  return NextResponse.json(
+    { message: 'Test endpoint' },
+    { status: 200 }
+  );
 }

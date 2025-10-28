@@ -139,6 +139,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             console.log('📝 Signup attempt:', email);
             
             // Call signup API
+            console.log('📤 Sending signup request to /api/auth/signup...');
             const response = await fetch('/api/auth/signup', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -153,13 +154,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 }),
             });
 
+            console.log('📥 Signup response status:', response.status);
+
             if (!response.ok) {
-                const error = await response.json();
-                console.error('❌ Signup failed:', error.error);
+                try {
+                    const error = await response.json();
+                    console.error('❌ Signup failed:', error.error);
+                } catch {
+                    console.error('❌ Signup failed with status:', response.status);
+                }
                 return false;
             }
 
-            const { user: apiUser } = await response.json();
+            const data = await response.json();
+            console.log('✅ Signup response received:', { success: data.success, hasUser: !!data.user });
+            
+            if (!data.success || !data.user) {
+                console.error('❌ Signup response indicates failure:', data);
+                return false;
+            }
+
+            const { user: apiUser } = data;
             console.log('✅ Signup successful:', apiUser.email);
 
             // Convert API user to app user format
@@ -187,19 +202,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         
         try {
             // Call login API
+            console.log('📤 Sending login request to /api/auth/login...');
             const response = await fetch('/api/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password: pass }),
             });
 
+            console.log('📥 Login response status:', response.status);
+
             if (!response.ok) {
-                const error = await response.json();
-                console.error('❌ Login failed:', error.error);
+                try {
+                    const error = await response.json();
+                    console.error('❌ Login failed:', error.error);
+                } catch {
+                    console.error('❌ Login failed with status:', response.status);
+                }
                 return false;
             }
 
-            const { user: apiUser } = await response.json();
+            const data = await response.json();
+            console.log('✅ Login response received:', { hasUser: !!data.user, email: data.user?.email });
+            
+            if (!data.success || !data.user) {
+                console.error('❌ Login response indicates failure:', data);
+                return false;
+            }
+
+            const { user: apiUser } = data;
             console.log('✅ Database login successful:', apiUser.email);
 
             // Convert API user to app user format

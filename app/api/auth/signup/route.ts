@@ -1,8 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createUser } from '@/lib/auth-service';
+import { ensurePrismaConnected } from '@/lib/prisma';
 
 export async function POST(request: NextRequest) {
   try {
+    // Ensure database connection is available
+    try {
+      await ensurePrismaConnected();
+    } catch (dbError) {
+      console.error('❌ Database connection failed:', dbError);
+      return NextResponse.json(
+        { success: false, error: 'Database connection failed. Please try again later.' },
+        { status: 503 }
+      );
+    }
+
     const {
       email,
       password,
@@ -12,6 +24,8 @@ export async function POST(request: NextRequest) {
       country,
       industry,
     } = await request.json();
+
+    console.log('📝 Signup request for:', email);
 
     // Validate input
     if (!email || !password || !name) {
@@ -39,6 +53,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create user
+    console.log('🔐 Creating new user:', email);
     const result = await createUser(email, password, name, 'admin', {
       companyName,
       numPrinters,
@@ -47,21 +62,24 @@ export async function POST(request: NextRequest) {
     });
 
     if (!result.success) {
+      console.log('❌ User creation failed:', result.error);
       return NextResponse.json(
         { success: false, error: result.error || 'Failed to create user' },
         { status: 400 }
       );
     }
 
+    console.log('✅ User created successfully:', email);
     // Return user data
     return NextResponse.json(
       { success: true, user: result.user },
       { status: 201 }
     );
   } catch (error) {
-    console.error('Signup API error:', error);
+    console.error('❌ Signup API error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error';
     return NextResponse.json(
-      { success: false, error: 'Internal server error' },
+      { success: false, error: `Signup failed: ${errorMessage}` },
       { status: 500 }
     );
   }

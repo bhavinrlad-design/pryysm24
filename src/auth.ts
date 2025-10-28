@@ -3,21 +3,10 @@ import AzureADProvider from "next-auth/providers/azure-ad"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import { PrismaClient } from "@prisma/client"
 
-let prisma: PrismaClient | null = null
-
-function getPrisma() {
-  if (!prisma) {
-    prisma = new PrismaClient()
-  }
-  return prisma
-}
-
-function getPrismaAdapter() {
-  return PrismaAdapter(getPrisma())
-}
+const prisma = new PrismaClient()
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  adapter: getPrismaAdapter(),
+  adapter: PrismaAdapter(prisma),
   providers: [
     AzureADProvider({
       clientId: process.env.AZURE_AD_CLIENT_ID || "",
