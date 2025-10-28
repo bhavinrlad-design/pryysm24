@@ -1,14 +1,14 @@
 // Simple diagnostic server for Azure App Service
 const http = require('http');
 
-console.log('[SERVER] Starting diagnostic server...');
-console.log('[SERVER] Node.js version:', process.version);
-console.log('[SERVER] Working directory:', process.cwd());
-console.log('[SERVER] Environment variables:');
-console.log('[SERVER] NODE_ENV:', process.env.NODE_ENV);
-console.log('[SERVER] PORT:', process.env.PORT);
-console.log('[SERVER] DATABASE_URL configured:', !!process.env.DATABASE_URL);
-console.log('[SERVER] NEXTAUTH_URL:', process.env.NEXTAUTH_URL);
+// Immediate logging
+console.log('\n========================================');
+console.log('[STARTUP] Diagnostic server initializing');
+console.log('[STARTUP] Timestamp:', new Date().toISOString());
+console.log('[STARTUP] Node.js version:', process.version);
+console.log('[STARTUP] Working directory:', process.cwd());
+console.log('[STARTUP] Process ID:', process.pid);
+console.log('========================================\n');
 
 const server = http.createServer((req, res) => {
   console.log(`[REQUEST] ${req.method} ${req.url}`);
@@ -49,30 +49,41 @@ const server = http.createServer((req, res) => {
 // Get port from environment variable or default to 8080
 const port = process.env.PORT || 8080;
 
-server.listen(port, (err) => {
-  if (err) {
-    console.error('[SERVER] Error starting server:', err);
-    process.exit(1);
-  }
-  
-  console.log(`[SERVER] Diagnostic server listening on port ${port}`);
-  console.log(`[SERVER] Process ID: ${process.pid}`);
-  console.log(`[SERVER] Server started successfully at ${new Date().toISOString()}`);
+console.log('\n[LISTEN] Attempting to bind to port:', port);
+console.log('[LISTEN] Creating HTTP server...\n');
+
+server.listen(port, () => {
+  console.log('========================================');
+  console.log('[SUCCESS] Server is now running!');
+  console.log('[SUCCESS] Listening on port:', port);
+  console.log('[SUCCESS] Process ID:', process.pid);
+  console.log('[SUCCESS] Started at:', new Date().toISOString());
+  console.log('========================================');
+  console.log('[READY] Server ready to accept connections\n');
 });
 
 server.on('error', (error) => {
-  console.error('[SERVER] Server error:', error);
+  console.error('\n========================================');
+  console.error('[ERROR] Server error occurred:');
+  console.error(error);
+  console.error('========================================\n');
   process.exit(1);
 });
 
 process.on('uncaughtException', (error) => {
-  console.error('[SERVER] Uncaught exception:', error);
+  console.error('\n========================================');
+  console.error('[FATAL] Uncaught exception:');
+  console.error(error);
+  console.error('========================================\n');
   process.exit(1);
 });
 
 process.on('unhandledRejection', (reason, promise) => {
-  console.error('[SERVER] Unhandled rejection:', reason);
+  console.error('\n========================================');
+  console.error('[FATAL] Unhandled rejection:');
+  console.error(reason);
+  console.error('========================================\n');
   process.exit(1);
 });
 
-console.log('[SERVER] Event handlers registered, server setup complete');
+console.log('[INIT] Event handlers registered');

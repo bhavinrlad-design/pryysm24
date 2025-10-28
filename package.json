@@ -1,12 +1,9 @@
 {
   "name": "pryysm-diagnostic",
   "version": "1.0.0",
-  "description": "Simple diagnostic server for Azure App Service",
+  "description": "Simple diagnostic server",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
-  },
-  "engines": {
-    "node": ">=18.0.0"
   }
 }
