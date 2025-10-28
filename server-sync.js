@@ -15,11 +15,17 @@ const now = () => new Date().toISOString();
 console.log(`[${now()}] Starting SYNC server...`);
 const startTime = Date.now();
 
-// Initialize database before loading Next.js
-(async () => {
-  await initializeDatabase();
-})().catch(err => {
-  console.error(`[${now()}] Database initialization warning:`, err.message);
+// Initialize database in background (don't block app startup)
+// This allows the app to start even if DB connection fails
+setImmediate(async () => {
+  try {
+    console.log(`[${now()}] Initializing database in background...`);
+    await initializeDatabase();
+    console.log(`[${now()}] ✅ Database initialized successfully`);
+  } catch (err) {
+    console.warn(`[${now()}] ⚠️ Database initialization failed (continuing anyway):`, err.message);
+    console.warn(`[${now()}] App will still start - authentication will fail until DB is available`);
+  }
 });
 
 // Load Next.js synchronously (will block for ~100 seconds)
