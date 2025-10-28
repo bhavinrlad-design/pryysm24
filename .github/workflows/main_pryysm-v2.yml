@@ -74,6 +74,7 @@ jobs:
         run: |
           az webapp config set --name PRYYSM-V2 --resource-group PRYYSM-V2_group --use-32bit-worker-process false
           az webapp config set --name PRYYSM-V2 --resource-group PRYYSM-V2_group --web-sockets-enabled true
+          az webapp config set --name PRYYSM-V2 --resource-group PRYYSM-V2_group --always-on true
 
       - name: 'Set App Settings'
         uses: azure/appservice-settings@v1
