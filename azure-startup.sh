@@ -9,5 +9,5 @@ export PORT=${PORT:-8080}
 # Install dependencies
 npm install --legacy-peer-deps --omit=dev
 
-# Start the server
-npm start
+# Start using npx to ensure next is found
+npx next start
