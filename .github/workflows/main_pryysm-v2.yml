@@ -39,21 +39,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: node-app
-          path: |
-            .next
-            public
-            prisma
-            package.json
-            package-lock.json
-            index.js
-            instrumentation.ts
-            jsconfig.json
-            web.config
-            .deployment
-            .npmrc
-            startup.sh
-            start-with-diagnostics.sh
-            Procfile
+          path: .
 
   deploy:
     runs-on: ubuntu-latest

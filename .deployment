@@ -1,2 +1,2 @@
 [config]
-command = bash startup.sh
+command = npm install --legacy-peer-deps --no-optional && npm start

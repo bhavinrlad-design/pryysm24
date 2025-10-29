@@ -1,1 +1,1 @@
-web: NODE_ENV=production node index.js
+web: bash azure-startup.sh
