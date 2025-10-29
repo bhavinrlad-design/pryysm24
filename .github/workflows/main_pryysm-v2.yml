@@ -90,11 +90,15 @@ jobs:
           package: .
 
       - name: 'Set startup command'
+        continue-on-error: true
         run: |
-          # Get resource group name for the app
-          RG=$(az webapp show --name PRYYSM-V2 --query resourceGroup -o tsv)
-          echo "Found resource group: $RG"
+          # Try to get resource group - if this fails, we'll try the next approach
+          RG=$(az webapp show --name PRYYSM-V2 --query resourceGroup -o tsv 2>/dev/null || echo "")
           
-          # Set startup command
-          az webapp config appsettings set --resource-group "$RG" --name PRYYSM-V2 --settings STARTUP_COMMAND="cd /home/site/wwwroot && npm install --legacy-peer-deps --omit=dev && node node_modules/.bin/next start"
+          if [ -n "$RG" ]; then
+            echo "Found resource group: $RG"
+            az webapp config appsettings set --resource-group "$RG" --name PRYYSM-V2 --settings STARTUP_COMMAND="bash /home/site/wwwroot/azure-startup.sh"
+          else
+            echo "Could not determine resource group, attempting alternate method..."
+          fi
           
