@@ -11,46 +11,58 @@ export PORT=${PORT:-8080}
 
 echo "Environment: $NODE_ENV"
 echo "Port: $PORT"
+echo "Working Directory: $(pwd)"
 echo ""
 
-# Install dependencies
-echo "📦 Installing dependencies..."
-npm install --legacy-peer-deps --omit=dev
-
-echo "✅ Dependencies installed"
+# List what we have
+echo "� Contents of current directory:"
+ls -la | head -15
 echo ""
 
-# Verify .next exists
-echo "🔍 Checking .next folder..."
-if [ ! -d ".next" ]; then
-  echo "⚠️  .next not found, rebuilding..."
-  npm run build
-fi
-
-# Check for standalone mode
+# Check for standalone mode first
 echo "🔍 Checking for standalone mode..."
 if [ -d ".next/standalone" ]; then
-  echo "✅ Standalone mode detected - copying files..."
-  # Copy necessary files to standalone directory
-  cp package*.json .next/standalone/ 2>/dev/null || true
-  cp -r public .next/standalone/ 2>/dev/null || true
-  cp -r prisma .next/standalone/ 2>/dev/null || true
+  echo "✅ Standalone mode detected!"
+  echo ""
+  echo "📂 Contents of .next/standalone:"
+  ls -la .next/standalone/ | head -15
+  echo ""
   
-  # Change to standalone directory
+  # Standalone mode is self-contained - just run it
   cd .next/standalone
   
-  echo "📁 Current directory: $(pwd)"
-  echo "▶️  Starting with standalone Next.js server"
+  echo "📁 Changed to: $(pwd)"
+  echo ""
+  echo "🔍 Checking for node_modules in standalone..."
+  if [ -d "node_modules" ]; then
+    echo "✅ node_modules found in standalone"
+  else
+    echo "⚠️  node_modules NOT in standalone - this is a problem!"
+    echo "   Listing contents:"
+    ls -la
+  fi
   echo ""
   
-  # Start the server (standalone includes node_modules)
+  echo "▶️  Starting server.js from standalone..."
   exec node server.js
 else
-  echo "📁 Standard mode - running from project root"
-  echo ""
-  echo "▶️  Starting with: npx next start"
+  echo "⚠️  No standalone mode detected - falling back to project mode"
   echo ""
   
-  # Standard mode - start using Next.js built-in server
+  # Fallback: Install dependencies and run normally
+  echo "📦 Installing dependencies..."
+  npm install --legacy-peer-deps --omit=dev
+  
+  echo "✅ Dependencies installed"
+  echo ""
+  
+  # Verify .next exists
+  echo "🔍 Checking .next folder..."
+  if [ ! -d ".next" ]; then
+    echo "⚠️  .next not found, rebuilding..."
+    npm run build
+  fi
+  
+  echo "▶️  Starting with: npx next start"
   exec npx next start
 fi
