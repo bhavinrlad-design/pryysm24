@@ -32,12 +32,7 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
           NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
-
-      - name: Run Prisma migrations
-        run: |
-          npx prisma db push --skip-generate
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          NODE_ENV: production
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
