@@ -52,6 +52,8 @@ jobs:
             .deployment
             .npmrc
             startup.sh
+            start-with-diagnostics.sh
+            Procfile
 
   deploy:
     runs-on: ubuntu-latest

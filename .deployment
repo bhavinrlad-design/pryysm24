@@ -1,2 +1,2 @@
 [config]
-command = bash -c "npm install --legacy-peer-deps && NODE_ENV=production node index.js"
+command = bash startup.sh
