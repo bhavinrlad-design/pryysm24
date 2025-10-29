@@ -1,1 +1,1 @@
-web: node /node_modules/.bin/next start
+web: node node_modules/.bin/next start
