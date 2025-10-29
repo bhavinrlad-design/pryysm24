@@ -49,6 +49,7 @@ jobs:
           name: node-app
           path: |
             .next
+            node_modules
             public
             prisma
             package.json
