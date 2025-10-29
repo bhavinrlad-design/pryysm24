@@ -62,6 +62,7 @@ jobs:
             .npmrc
             Procfile
             azure-startup.sh
+            appsvc.yaml
 
   deploy:
     runs-on: ubuntu-latest
