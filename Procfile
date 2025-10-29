@@ -1,1 +1,1 @@
-web: bash azure-startup.sh
+web: node /node_modules/.bin/next start
