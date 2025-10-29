@@ -1,2 +1,2 @@
 [config]
-command = npm install --legacy-peer-deps && npx prisma generate && npm run build && npm start
+command = bash -c "npm install --legacy-peer-deps && NODE_ENV=production node index.js"

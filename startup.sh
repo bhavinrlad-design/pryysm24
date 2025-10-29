@@ -1,11 +1,19 @@
 #!/bin/bash
+set -e
 
-# Start Node.js server in background and exit immediately
-# This fools Azure's health check into thinking startup is complete
-nohup node index.js > /tmp/node.log 2>&1 &
+echo "🚀 Starting Pryysm Application"
+echo "Node Version: $(node --version)"
+echo "npm Version: $(npm --version)"
+echo "Environment: ${NODE_ENV:-production}"
+echo "Port: ${PORT:-8080}"
 
-# Give server a moment to start
-sleep 1
+# Install dependencies if node_modules doesn't exist
+if [ ! -d "node_modules" ]; then
+  echo "📦 Installing dependencies..."
+  npm install --legacy-peer-deps
+fi
 
-# Exit with success so Azure thinks we're done
-exit 0
+# Start application in foreground
+echo "▶️ Starting Node.js server..."
+export NODE_ENV=${NODE_ENV:-production}
+exec node index.js

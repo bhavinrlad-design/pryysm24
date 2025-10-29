@@ -51,6 +51,7 @@ jobs:
             web.config
             .deployment
             .npmrc
+            startup.sh
 
   deploy:
     runs-on: ubuntu-latest
