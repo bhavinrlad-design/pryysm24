@@ -11,7 +11,7 @@
     "lint": "eslint . --ext .ts,.tsx",
     "format": "prettier --write .",
     "tailwind:update": "npm install tailwindcss@latest postcss@latest autoprefixer@latest --save-dev",
-    "start": "node node_modules/.bin/next start",
+    "start": "next start",
     "build:css": "postcss app/globals.css -o app/output.css",
     "azure-postbuild": "npm run build",
     "build:azure": "cross-env NODE_ENV=production next build",
