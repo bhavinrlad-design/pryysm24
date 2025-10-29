@@ -27,10 +27,30 @@ if [ ! -d ".next" ]; then
   npm run build
 fi
 
-echo "✅ Ready to start"
-echo ""
-echo "▶️  Starting with: npx next start"
-echo ""
-
-# Start using Next.js built-in server (using npx to ensure it finds next)
-exec npx next start
+# Check for standalone mode
+echo "🔍 Checking for standalone mode..."
+if [ -d ".next/standalone" ]; then
+  echo "✅ Standalone mode detected - copying files..."
+  # Copy necessary files to standalone directory
+  cp package*.json .next/standalone/ 2>/dev/null || true
+  cp -r public .next/standalone/ 2>/dev/null || true
+  cp -r prisma .next/standalone/ 2>/dev/null || true
+  
+  # Change to standalone directory
+  cd .next/standalone
+  
+  echo "📁 Current directory: $(pwd)"
+  echo "▶️  Starting with standalone Next.js server"
+  echo ""
+  
+  # Start the server (standalone includes node_modules)
+  exec node server.js
+else
+  echo "📁 Standard mode - running from project root"
+  echo ""
+  echo "▶️  Starting with: npx next start"
+  echo ""
+  
+  # Standard mode - start using Next.js built-in server
+  exec npx next start
+fi
