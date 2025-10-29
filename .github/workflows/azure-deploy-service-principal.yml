@@ -1,0 +1,146 @@
+name: Deploy to Azure (Service Principal - Legacy)
+
+on:
+  # DISABLED - Use main_pryysm-v2.yml instead
+  workflow_dispatch:  # Only manual trigger allowed
+
+permissions:
+  contents: read
+
+env:
+  AZURE_WEBAPP_NAME: ${{ secrets.AZURE_APP_NAME }}
+  NODE_VERSION: '20'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          # Install with PRISMA_SKIP_POSTINSTALL to prevent client generation
+          npm install
+        env:
+          PRISMA_SKIP_POSTINSTALL: "true"
+
+      - name: Create production env file
+        run: |
+          cat > .env.production << EOL
+          # Production environment variables for Azure
+          DATABASE_URL=${{ secrets.DATABASE_URL }}
+          NODE_ENV=production
+          NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
+          PORT=8080
+          SKIP_ENV_VALIDATION=true
+          SKIP_ESLINT_VALIDATION=true
+          SKIP_PRISMA_VALIDATION=true
+          EOL
+
+      - name: Build for Azure
+        run: |
+          # Run the build with standalone output
+          npm run build
+        env:
+          NODE_ENV: production
+          SKIP_ENV_VALIDATION: "true"
+          PRISMA_SKIP_POSTINSTALL: "true"
+      
+      - name: Azure Post-Build Tasks
+        run: |
+          echo "Running Azure post-build tasks..."
+          
+          if [ ! -d ".next/standalone" ]; then
+            echo "Error: .next/standalone not found"
+            exit 1
+          fi
+          
+          echo "Pruning unnecessary node_modules to speed up startup..."
+          
+          # Remove EVERYTHING that isn't needed at runtime
+          rm -rf .next/standalone/node_modules/@prisma 2>/dev/null || true
+          rm -rf .next/standalone/node_modules/prisma 2>/dev/null || true
+          rm -rf .next/standalone/node_modules/typescript 2>/dev/null || true
+          rm -rf .next/standalone/node_modules/eslint 2>/dev/null || true
+          rm -rf .next/standalone/node_modules/@types 2>/dev/null || true
+          rm -rf .next/standalone/node_modules/@typescript-eslint 2>/dev/null || true
+          rm -rf .next/standalone/node_modules/prettier 2>/dev/null || true
+          rm -rf .next/standalone/node_modules/ts-node 2>/dev/null || true
+          rm -rf .next/standalone/node_modules/@babel 2>/dev/null || true
+          rm -rf .next/standalone/node_modules/webpack 2>/dev/null || true
+          rm -rf .next/standalone/node_modules/babel-loader 2>/dev/null || true
+          rm -rf .next/standalone/node_modules/react-devtools 2>/dev/null || true
+          
+          # Remove docs, tests, examples from all modules
+          find .next/standalone/node_modules -type d \( -name 'test' -o -name 'tests' -o -name 'docs' -o -name 'examples' -o -name '.github' \) -exec rm -rf {} + 2>/dev/null || true
+          
+          # Remove markdown, source maps, and other non-essential files
+          find .next/standalone/node_modules -type f \( -name '*.md' -o -name '*.map' -o -name '*.test.js' -o -name '*.spec.js' -o -name 'LICENSE' -o -name 'CHANGELOG*' \) -delete 2>/dev/null || true
+          
+          # Check size
+          du -sh .next/standalone/node_modules | head -1
+          
+          # Copy entry point files (use Next.js's native server.js)
+          cp index-nextjs.js .next/standalone/index.js
+          cp web.config .next/standalone/
+          
+          echo "✓ Build prep complete"
+
+      # Login to Azure using Service Principal (Legacy method)
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          
+      # Create a deployment package
+      - name: Create deployment package
+        run: |
+          cd .next/standalone
+          zip -r ../../deploy.zip .
+          cd ../..
+          echo "Package ready"
+      # Deploy using Azure CLI with longer timeout
+      - name: Deploy to Azure App Service using Azure CLI
+        run: |
+          echo "Starting deployment with Azure CLI (600s timeout)..."
+          
+          az webapp deployment source config-zip \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --name ${{ secrets.AZURE_APP_NAME }} \
+            --src deploy.zip \
+            --timeout 600
+          
+          echo "✓ Deployment completed!"
+      
+      # Configure App Startup
+      - name: Configure App Startup  
+        run: |
+          echo "Configuring app..."
+          
+          # Set startup command
+          az webapp config set \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --name ${{ secrets.AZURE_APP_NAME }} \
+            --startup-file "node index.js" \
+            --remote-debugging-enabled false
+          
+          # Disable health check to allow full startup time
+          az webapp config appsettings set \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --name ${{ secrets.AZURE_APP_NAME }} \
+            --settings NODE_ENV=production WEBSITE_HEALTHCHECK_PATH="" WEBSITE_HEALTHCHECK_MAXPINGFAILURES=1000
+          
+          echo "✓ App configured"
+          
+      # Logout from Azure
+      - name: Logout from Azure
+        run: az logout
+        if: always()

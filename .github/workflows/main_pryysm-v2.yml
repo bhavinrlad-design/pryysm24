@@ -48,6 +48,9 @@ jobs:
             index.js
             instrumentation.ts
             jsconfig.json
+            web.config
+            .deployment
+            .npmrc
 
   deploy:
     runs-on: ubuntu-latest
