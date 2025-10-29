@@ -88,4 +88,8 @@ jobs:
           app-name: 'PRYYSM-V2'
           slot-name: 'Production'
           package: .
+
+      - name: 'Set startup command'
+        run: |
+          az webapp config appsettings set --resource-group pryysm-v2 --name PRYYSM-V2 --settings STARTUP_COMMAND="cd /home/site/wwwroot && npm install --legacy-peer-deps --omit=dev && node node_modules/.bin/next start"
           
