@@ -18,42 +18,39 @@ echo "Environment: $NODE_ENV"
 echo "Port: $PORT"
 echo ""
 
-# Step 1: Clean old npm cache (sometimes helps on Azure)
-echo "🧹 Cleaning npm cache..."
-npm cache clean --force 2>/dev/null || true
+# Step 1: Verify we're in the right directory
+echo "📍 Current directory: $(pwd)"
+echo "📁 Contents:"
+ls -la | head -20
+echo ""
 
-# Step 2: Install dependencies FRESH
-echo "📦 Installing dependencies..."
-rm -rf node_modules package-lock.json 2>/dev/null || true
-npm install --legacy-peer-deps --no-optional --omit=dev
+# Step 2: Install dependencies (fresh)
+echo "📦 Installing production dependencies..."
+npm install --legacy-peer-deps --omit=dev --no-save
 
 echo "✅ Dependencies installed"
 echo ""
 
-# Step 3: Verify build output exists
-echo "🔍 Verifying build output..."
+# Step 3: Verify build output exists - CRITICAL
+echo "🔍 Verifying build output (.next folder)..."
 if [ ! -d ".next" ]; then
-  echo "⚠️  .next folder missing! Rebuilding..."
+  echo "⚠️  .next folder missing! Rebuilding from source..."
   npm run build
+  if [ $? -ne 0 ]; then
+    echo "❌ Build failed!"
+    exit 1
+  fi
 else
-  echo "✅ .next folder found"
-fi
-
-# Step 4: Verify package.json and index.js
-if [ ! -f "package.json" ]; then
-  echo "❌ ERROR: package.json not found!"
-  exit 1
-fi
-
-if [ ! -f "index.js" ]; then
-  echo "⚠️  index.js not found, will use 'npm start'"
+  echo "✅ .next folder found:"
+  du -sh .next/
 fi
 
 echo ""
 echo "=========================================="
-echo "▶️  Starting application..."
+echo "✅ All checks passed!"
+echo "▶️  Starting application with 'npm start'"
 echo "=========================================="
 echo ""
 
-# Step 5: Start the application
+# Step 4: Start the application (npm start = next start)
 exec npm start

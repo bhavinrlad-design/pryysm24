@@ -35,11 +35,32 @@ jobs:
           NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
           NODE_ENV: production
 
+      - name: Verify build output
+        run: |
+          echo "🔍 Verifying .next folder..."
+          ls -la .next/ || echo "❌ ERROR: .next folder not found!"
+          echo ""
+          echo "📊 Artifact contents:"
+          du -sh .next/ package.json public/
+
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: node-app
-          path: .
+          path: |
+            .next
+            public
+            prisma
+            package.json
+            package-lock.json
+            index.js
+            instrumentation.ts
+            jsconfig.json
+            web.config
+            .deployment
+            .npmrc
+            Procfile
+            azure-startup.sh
 
   deploy:
     runs-on: ubuntu-latest

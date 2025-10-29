@@ -1,2 +1,2 @@
 [config]
-command = npm install --legacy-peer-deps --no-optional && npm start
+command = bash azure-startup.sh
