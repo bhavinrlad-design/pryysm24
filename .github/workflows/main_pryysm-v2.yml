@@ -25,44 +25,15 @@ jobs:
 
       - name: npm install, build, and test
         run: |
-          npm install --legacy-peer-deps
-          npx prisma generate
+          npm install
           npm run build --if-present
           npm run test --if-present
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
-          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
-          NODE_ENV: production
-
-      - name: Verify build output
-        run: |
-          echo "🔍 Verifying .next folder..."
-          ls -la .next/ || echo "❌ ERROR: .next folder not found!"
-          echo ""
-          echo "📊 Artifact contents:"
-          du -sh .next/ package.json public/
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: node-app
-          path: |
-            .next
-            node_modules
-            public
-            prisma
-            package.json
-            package-lock.json
-            index.js
-            instrumentation.ts
-            jsconfig.json
-            web.config
-            .deployment
-            .npmrc
-            Procfile
-            azure-startup.sh
-            appsvc.yaml
+          path: .
 
   deploy:
     runs-on: ubuntu-latest
@@ -80,7 +51,9 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_A23BEABC8B734DC3A0063956982C1B46 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_B5662859EBF3467D9F39BAF0FD1A55E5 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_B227965F16E04090A0DF50C8B567C7A9 }}
 
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
@@ -89,17 +62,4 @@ jobs:
           app-name: 'PRYYSM-V2'
           slot-name: 'Production'
           package: .
-
-      - name: 'Set startup command'
-        continue-on-error: true
-        run: |
-          # Try to get resource group - if this fails, we'll try the next approach
-          RG=$(az webapp show --name PRYYSM-V2 --query resourceGroup -o tsv 2>/dev/null || echo "")
-          
-          if [ -n "$RG" ]; then
-            echo "Found resource group: $RG"
-            az webapp config appsettings set --resource-group "$RG" --name PRYYSM-V2 --settings STARTUP_COMMAND="bash /home/site/wwwroot/azure-startup.sh"
-          else
-            echo "Could not determine resource group, attempting alternate method..."
-          fi
           
