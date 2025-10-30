@@ -1,3 +1,7 @@
 [config]
-SCM_DO_BUILD_DURING_DEPLOYMENT=false
-command = bash -c "cd /home/site/wwwroot && npm install --legacy-peer-deps --omit=dev && node node_modules/.bin/next start"
+# Let Oryx perform the build and install on the server so Linux-compatible
+# node binaries (including `next`) are created instead of uploading local
+# (Windows) node_modules which can produce incompatible `.bin` shims.
+SCM_DO_BUILD_DURING_DEPLOYMENT=true
+# Keep startup command simple; Oryx will run the build/install. Use `npm start`.
+command = bash -c "cd /home/site/wwwroot && npm start"
