@@ -3,11 +3,11 @@ name: Build and Deploy to Azure on push
 on:
   push:
     branches: [ main ]
-  workflow_dispatch:  # Allow manual triggers
+  workflow_dispatch:
 
 env:
   NODE_VERSION: '20'
-  AZURE_WEBAPP_NAME: pryysm-v2  # Your Azure Web App name
+  AZURE_WEBAPP_NAME: pryysm-v2
 
 jobs:
   build-and-deploy:
@@ -45,74 +45,25 @@ jobs:
 
       - name: Prepare standalone package
         run: |
+          # Ensure Next's standalone output exists
+          if [ ! -d ".next/standalone" ]; then
+            echo ".next/standalone not found, listing .next" && ls -la .next || true
+          fi
+          # Copy any repo-level server or configs into standalone folder so it's self-contained
           mkdir -p .next/standalone
           cp server.js .next/standalone/ || true
           cp web.config .next/standalone/ || true
           if [ -d "public" ]; then cp -r public .next/standalone/; fi
-          if [ -d ".next/static" ]; then
-            mkdir -p .next/standalone/.next/static
-            cp -r .next/static .next/standalone/.next/
-          fi
 
-      - name: Deploy to Azure Web App
+      - name: Zip standalone package
+        run: |
+          rm -f deploy.zip
+          cd .next/standalone
+          zip -r ../../deploy.zip . || true
+
+      - name: Deploy to Azure Web App (zip)
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: .next/standalone
-name: Build and Deploy to Azure on push
-
-on:
-  push:
-    branches: [ main ]
-
-env:
-  NODE_VERSION: '20'
-
-jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Create production env file
-        run: |
-          cat > .env.production << EOL
-          NODE_ENV=production
-          PORT=8080
-          EOL
-
-      - name: Run Prisma generate (safe if not present)
-        run: npx prisma generate || true
-
-      - name: Build Next.js
-        run: |
-          cp next.config.azure.js next.config.js || true
-          npm run build
-        env:
-          NODE_ENV: production
-
-      - name: Prepare standalone package
-        run: |
-          mkdir -p .next/standalone
-          cp server.js .next/standalone/ || true
-          cp web.config .next/standalone/ || true
-          if [ -d "public" ]; then cp -r public .next/standalone/; fi
-
-      - name: Deploy to Azure Web App
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: ${{ secrets.AZURE_APP_NAME }}
-          publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
-          package: .next/standalone
+          package: deploy.zip
