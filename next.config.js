@@ -2,8 +2,7 @@ const path = require('path');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Disable standalone for now - use standard next start
-  // output: 'standalone',
+  output: 'standalone',
   images: {
     remotePatterns: [
       {

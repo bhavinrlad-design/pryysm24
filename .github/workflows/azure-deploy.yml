@@ -1,122 +1,92 @@
-name: Deploy to Azure App Service (DISABLED - Use alternative workflow)
+name: Deploy to Azure App Service
 
 on:
-  # Temporarily disabled - use azure-deploy-alternative.yml instead
-  workflow_dispatch:  # Only manual trigger allowed
+  push:
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Workflow Disabled
-        run: |
-          echo "This workflow is temporarily disabled due to authentication issues."
-          echo "Please use the azure-deploy-alternative.yml workflow instead."
-          echo "To enable this workflow, you need to:"
-          echo "1. Create a new service principal with: az ad sp create-for-rbac --name 'GitHub-Actions-Deploy' --role contributor --scopes /subscriptions/{YOUR-SUBSCRIPTION-ID}/resourceGroups/{YOUR-RESOURCE-GROUP} --sdk-auth"
-          echo "2. Copy the ENTIRE JSON output and save it as AZURE_CREDENTIALS secret in GitHub"
-          echo "3. Ensure the JSON includes clientSecret (not just the ID)"
-          exit 1
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '20'
-          # Temporarily disable npm cache to avoid initial setup issues
-          # cache: 'npm'
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm install
 
       - name: Create production env file
         run: |
-          cat > .env.production << EOL
-          # Production environment variables for Azure
-          DATABASE_URL=${{ secrets.DATABASE_URL }}
-          NODE_ENV=production
-          NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
-          PORT=8080
-          ${{ secrets.ADDITIONAL_ENV_VARS }}
-          EOL
+          echo "Creating .env.production file..."
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" > .env.production
+          echo "NODE_ENV=production" >> .env.production
+          echo "NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}" >> .env.production
+          echo "PORT=8080" >> .env.production
+          # Add any other build-time secrets if necessary
 
       - name: Run Prisma generate
         run: npx prisma generate
         
-      - name: Build for Azure
+      - name: Build Next.js application
         run: |
-          # Create a copy of azure config as next.config.js temporarily
-          cp next.config.azure.js next.config.js.bak
-          cp next.config.azure.js next.config.js
-          
-          # Run the build
           npm run build
-          
-          # Restore original next.config.js
-          mv next.config.js.bak next.config.js
         env:
           NODE_ENV: production
       
-      - name: Azure Post-Build Tasks
+      - name: Prepare package for deployment
         run: |
-          echo "Running Azure post-build tasks..."
-          # Check if .next directory exists
-          if [ ! -d ".next" ]; then
-            echo "Error: .next directory does not exist. Build may have failed."
+          echo "Preparing deployment package..."
+          # The standalone output is the recommended way to deploy Next.js.
+          # Ensure your next.config.js has `output: 'standalone'`.
+          if [ ! -d ".next/standalone" ]; then
+            echo "Error: .next/standalone directory not found. Build may have failed."
             exit 1
           fi
           
-          # Check if standalone directory exists, create if not
-          if [ ! -d ".next/standalone" ]; then
-            echo "Creating missing standalone directory..."
-            mkdir -p .next/standalone
+          # Copy custom server files into the standalone directory.
+          if [ -f "server-parent.js" ]; then
+            cp server-parent.js .next/standalone/
+          fi
+          if [ -f "server-child.js" ]; then
+            cp server-child.js .next/standalone/
+          fi
+
+          # Copy web.config for IISNode on Windows App Service.
+          if [ -f "web.config" ]; then
+            cp web.config .next/standalone/
           fi
           
-          # Ensure server.js is included in the deployment
-          cp server.js .next/standalone/
-          # Copy Azure-specific configuration
-          cp next.config.azure.js .next/standalone/
-          # Copy web.config for IIS
-          cp web.config .next/standalone/
-          
-          # Copy public assets if the directory exists
+          # Copy public assets.
           if [ -d "public" ]; then
             echo "Copying public directory..."
             cp -r public .next/standalone/
-          else
-            echo "Note: public directory does not exist, creating empty one."
-            mkdir -p .next/standalone/public
           fi
           
-          # Copy app directory assets if they exist (for images, etc.)
-          if [ -d "app" ]; then
-            echo "Copying app directory for assets..."
-            mkdir -p .next/standalone/app
-            # Only copy asset files, not code
-            find app -type f -name "*.png" -o -name "*.jpg" -o -name "*.jpeg" -o -name "*.svg" -o -name "*.ico" -o -name "*.gif" | xargs -I{} cp --parents {} .next/standalone/
-          fi
-          
-          # Create .next directory inside standalone if it doesn't exist
-          mkdir -p .next/standalone/.next
-          
-          # Copy static assets if they exist
+          # Copy static assets generated by the build.
           if [ -d ".next/static" ]; then
+            mkdir -p .next/standalone/.next
             cp -r .next/static .next/standalone/.next/
           else
             echo "Warning: .next/static directory not found."
           fi
 
-      # Authenticate to Azure using service principal
       - name: Azure Login with Service Principal
         uses: azure/login@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-          
-      # Then deploy to Azure App Service
+          creds: ${{ secrets.AZURE_CREDENTIALS }} # Ensure this secret contains the JSON from `az ad sp create-for-rbac`
+           
       - name: Deploy to Azure App Service
         id: deploy-to-azure
         uses: azure/webapps-deploy@v2
         with:
           app-name: ${{ secrets.AZURE_APP_NAME }}
-          slot-name: 'production'  # Use 'production' as default slot
+          slot-name: 'production'
           package: .next/standalone

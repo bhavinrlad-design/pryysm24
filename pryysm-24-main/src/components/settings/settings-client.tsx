@@ -49,7 +49,6 @@ export function SettingsClient() {
         currentPassword: '',
         newPassword: ''
     });
-    
     const [backupFrequency, setBackupFrequency] = useState('weekly');
     const [apiKey, setApiKey] = useState<string | null>(null);
     const [permissions, setPermissions] = useState({
@@ -59,7 +58,6 @@ export function SettingsClient() {
         accessFinancials: false,
     });
     const [codeSettings, setCodeSettings] = useState(initialCodeSettings);
-    
     const [supportSubject, setSupportSubject] = useState('');
     const [supportMessage, setSupportMessage] = useState('');
 
@@ -67,10 +65,8 @@ export function SettingsClient() {
         setCodeSettings(initialCodeSettings);
     }, [initialCodeSettings]);
 
-    const handleProfileChange = (field: keyof typeof profile, value: string) => {
-        setProfile(prev => ({...prev, [field]: value}));
-    };
-
+    const handleProfileChange = (field: keyof typeof profile, value: string) =>
+        setProfile(prev => ({ ...prev, [field]: value }));
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
@@ -83,7 +79,6 @@ export function SettingsClient() {
             reader.readAsDataURL(file);
         }
     };
-    
     const handleUpdateProfile = (e: React.FormEvent) => {
         e.preventDefault();
         if (user) {
@@ -94,7 +89,6 @@ export function SettingsClient() {
             description: 'Your profile information has been saved.'
         });
     }
-
     const handleUpdatePassword = (e: React.FormEvent) => {
         e.preventDefault();
         if (!profile.currentPassword || !profile.newPassword) {
@@ -111,24 +105,22 @@ export function SettingsClient() {
         });
         setProfile(prev => ({ ...prev, currentPassword: '', newPassword: ''}));
     }
-    
-    const handleCodeSettingChange = (key: keyof CodeSettings, value: string) => {
-        setCodeSettings(prev => ({...prev, [key]: value}));
+    const handleCodeSettingChange = (key: keyof CodeSettings, value: string | number) => {
+        setCodeSettings(prev => (prev ? { ...prev, [key]: value } : null));
     };
-
     const handleSaveCodeSettings = () => {
-        updateCodeSettings(codeSettings);
-        toast({
-            title: 'Code Settings Updated',
-            description: 'Your custom code prefixes have been saved.'
-        });
+        if (codeSettings) {
+            updateCodeSettings(codeSettings);
+            toast({
+                title: 'Code Settings Updated',
+                description: 'Your custom code prefixes have been saved.'
+            });
+        }
     }
-
     const handleSignOut = () => {
         logout();
         router.push('/login');
     }
-    
     const downloadCSV = (filename: string, headers: string[], dataRows: string[][]) => {
         const headerString = headers.join(',');
         const rowsString = dataRows.map(row => 
@@ -149,7 +141,6 @@ export function SettingsClient() {
             description: `${filename}.csv has been downloaded.`
         });
     };
-
     const handleExportWorkspace = () => {
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(workspaceData, null, 2));
         const downloadAnchorNode = document.createElement('a');
@@ -164,7 +155,6 @@ export function SettingsClient() {
             description: "A backup file has been downloaded."
         });
     }
-    
     const handleImportWorkspace = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (!file) return;
@@ -197,14 +187,12 @@ export function SettingsClient() {
         };
         reader.readAsText(file);
     }
-    
     const handleSaveBackupSchedule = () => {
         toast({
             title: "Schedule Saved",
             description: `Automatic backups are now set to run ${backupFrequency}.`
         })
     }
-    
     const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (!file || !uploadType) return;
@@ -235,12 +223,10 @@ export function SettingsClient() {
         }
         setUploadType(null);
     };
-
     const triggerFileUpload = (type: string) => {
         setUploadType(type);
         fileInputRef.current?.click();
     };
-
     const handleDownloadOrdersTemplate = () => {
         downloadCSV("orders_template", 
             ["orderNumber", "projectCode", "customerName", "orderDate", "deadline", "status", "items", "priority", "printerTech", "salesPerson", "notes", "imageUrl"],
@@ -250,7 +236,6 @@ export function SettingsClient() {
             ]
         );
     };
-
     const handleDownloadPrintersTemplate = () => {
         downloadCSV("printers_template",
             ["name", "model", "codeName", "location", "technology", "initializationDate", "capacity", "defaultMaterial"],
@@ -260,7 +245,6 @@ export function SettingsClient() {
             ]
         );
     };
-
     const handleDownloadRawMaterialsTemplate = () => {
         downloadCSV("raw_materials_template",
             ["type", "spoolId_or_resinId_or_powderId", "name", "brand", "material_or_type", "color", "finish", "weight_or_volume", "price", "currency", "purchaseDate", "minStock", "minOrder", "location", "notes", "imageUrl"],
@@ -271,7 +255,6 @@ export function SettingsClient() {
             ]
         );
     };
-
     const handleDownloadInventoryTemplate = () => {
         downloadCSV("inventory_template",
             ["barcode", "name", "description", "category", "quantity", "minStock", "minOrder", "location", "imageUrl"],
@@ -281,7 +264,6 @@ export function SettingsClient() {
             ]
         );
     };
-    
     const handleDownloadCustomersTemplate = () => {
          downloadCSV("customers_template",
             ["customerCode", "name", "email", "phone", "address", "company", "taxId"],
@@ -291,33 +273,27 @@ export function SettingsClient() {
             ]
          );
     };
-
     const handleGenerateKey = () => {
         const newKey = `pryysm_sk_${[...Array(32)].map(() => Math.random().toString(36)[2]).join('')}`;
         setApiKey(newKey);
         toast({ title: 'API Key Generated', description: 'Make sure to copy your new key. You won\'t be able to see it again.' });
     };
-
     const handleCopyKey = () => {
         if (apiKey) {
             navigator.clipboard.writeText(apiKey);
             toast({ title: 'API Key Copied', description: 'The key has been copied to your clipboard.' });
         }
     };
-
     const handleRevokeKey = () => {
         setApiKey(null);
         toast({ title: 'API Key Revoked', variant: 'destructive' });
     };
-
     const handlePermissionChange = (permission: keyof typeof permissions, value: boolean) => {
         setPermissions(prev => ({...prev, [permission]: value}));
     }
-
     const handleSavePermissions = () => {
         toast({ title: 'Permissions Updated', description: 'API key permissions have been saved.' });
     }
-
     const handleSendSupportMessage = () => {
         if (!supportSubject || !supportMessage) {
             toast({ variant: 'destructive', title: 'Missing Information', description: 'Please select a subject and write a message.' });
@@ -335,13 +311,11 @@ export function SettingsClient() {
         setSupportSubject('');
         setSupportMessage('');
     };
-
     return (
         <div className="flex-1 p-4 md:p-6 lg:p-8 space-y-8">
              <input type="file" ref={fileInputRef} onChange={handleFileUpload} className="hidden" accept=".csv" />
              <input type="file" ref={workspaceImportRef} onChange={handleImportWorkspace} className="hidden" accept=".json" />
              <input type="file" ref={profileImageRef} onChange={handleImageUpload} className="hidden" accept="image/*" />
-
             <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                  <div className="flex items-center gap-3">
                     <div className="bg-primary/10 p-3 rounded-lg">
@@ -353,7 +327,6 @@ export function SettingsClient() {
                     </div>
                 </div>
             </header>
-
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
                 <div className="lg:col-span-2 space-y-8">
                     {/* Profile Settings */}
@@ -416,7 +389,6 @@ export function SettingsClient() {
                             </form>
                         </CardContent>
                     </Card>
-
                      {/* Code Settings */}
                     <Card>
                         <CardHeader>
@@ -428,14 +400,14 @@ export function SettingsClient() {
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                                {(Object.keys(codeSettings) as Array<keyof CodeSettings>).map((key) => (
+                                {initialCodeSettings && (Object.keys(initialCodeSettings) as Array<keyof CodeSettings>).map((key) => (
                                     <div className="space-y-2" key={key}>
                                         <Label htmlFor={`code-${key}`} className="capitalize">{key.replace(/([A-Z])/g, ' $1')}</Label>
                                         <Input
                                             id={`code-${key}`}
-                                            value={codeSettings[key]}
+                                            value={codeSettings?.[key] ?? ''}
                                             onChange={(e) => handleCodeSettingChange(key, e.target.value)}
-                                            placeholder={initialCodeSettings[key]}
+                                            placeholder={initialCodeSettings?.[key] ?? ''}
                                         />
                                     </div>
                                 ))}
@@ -445,8 +417,6 @@ export function SettingsClient() {
                             <Button onClick={handleSaveCodeSettings} className="ml-auto">Save Code Settings</Button>
                         </CardFooter>
                     </Card>
-
-
                     {/* API Settings */}
                     <Card>
                         <CardHeader>
@@ -514,7 +484,6 @@ export function SettingsClient() {
                             )}
                         </CardContent>
                     </Card>
-                    
                     {/* Data Management */}
                     <Card>
                         <CardHeader>
@@ -553,7 +522,6 @@ export function SettingsClient() {
                                     ))}
                                 </div>
                             </div>
-                            
                             {/* Workspace Backup */}
                              <div>
                                 <h4 className="font-semibold text-foreground mb-2">Workspace Backup & Restore</h4>
@@ -591,7 +559,6 @@ export function SettingsClient() {
                         </CardContent>
                     </Card>
                 </div>
-                
                 {/* Right Column */}
                 <div className="lg:col-span-1 space-y-8">
                      {/* Subscription */}
@@ -615,7 +582,6 @@ export function SettingsClient() {
                             </div>
                         </CardContent>
                     </Card>
-
                     {/* Support Form */}
                     <Card>
                         <CardHeader>
@@ -655,8 +621,6 @@ export function SettingsClient() {
                             <Button onClick={handleSendSupportMessage} className="w-full">Send Message</Button>
                         </CardFooter>
                     </Card>
-
-
                      {/* Account Actions */}
                     <Card>
                         <CardHeader>

@@ -5,3 +5,6 @@
 SCM_DO_BUILD_DURING_DEPLOYMENT=true
 # Keep startup command simple; Oryx will run the build/install. Use `npm start`.
 command = bash -c "cd /home/site/wwwroot && npm start"
+
+- name: Upgrade npm
+  run: npm install -g npm@11.6.2
