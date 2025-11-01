@@ -112,18 +112,29 @@ export function SettingsClient() {
         const file = event.target.files?.[0];
         if (!file) return;
 
-        const text = await file.text();
-        const { headers, rows } = parseCsv(text);
+        try {
+            const rows = await parseCsv(file);
+            
+            if (rows.length > 0) {
+                const headers = Object.keys(rows[0]);
+                console.log('CSV Headers:', headers);
+                console.log('CSV Rows:', rows);
+            } else {
+                console.log('CSV file is empty.');
+            }
 
-        // Here you would typically do something with the parsed data,
-        // like sending it to a server or updating state.
-        console.log('CSV Headers:', headers);
-        console.log('CSV Rows:', rows);
-
-        toast({
-            title: "File Uploaded",
-            description: `${file.name} has been processed.`,
-        });
+            toast({
+                title: "File Uploaded",
+                description: `${file.name} has been processed.`,
+            });
+        } catch (error) {
+            console.error("Error parsing CSV:", error);
+            toast({
+                title: "Error Parsing File",
+                description: "There was an issue parsing the CSV file.",
+                variant: "destructive"
+            });
+        }
     };
     
     const handleSupportTicketChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
