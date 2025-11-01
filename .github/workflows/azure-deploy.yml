@@ -64,6 +64,12 @@ jobs:
             cp web.config .next/standalone/
           fi
           
+          # Copy prisma schema for standalone output
+          if [ -d "prisma" ]; then
+            echo "Copying prisma directory..."
+            cp -r prisma .next/standalone/
+          fi
+
           # Copy public assets.
           if [ -d "public" ]; then
             echo "Copying public directory..."
