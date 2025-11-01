@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast"
 import { Layers, Loader2, UserCheck } from 'lucide-react'
 import Link from 'next/link'
 import { signInAzureAD } from './actions'
+import { useSearchParams } from 'next/navigation'
 
 // Simple component for the Microsoft logo
 const MicrosoftLogo = () => (
@@ -23,6 +24,8 @@ export default function LoginPage() {
     const { loginWithEmail } = useAuth();
     const { toast } = useToast();
     const [isDemoLoading, setIsDemoLoading] = useState(false);
+    const searchParams = useSearchParams();
+    const error = searchParams.get('error');
 
     const handleDemoLogin = async () => {
         setIsDemoLoading(true);
@@ -73,6 +76,11 @@ export default function LoginPage() {
                 <div style={{textAlign: 'center', marginBottom: '2rem'}}>
                     <h2 style={{fontSize: '1.25rem', fontWeight: 700, color: '#111827', marginBottom: '0.5rem'}}>Sign In</h2>
                     <p style={{fontSize: '0.875rem', color: '#6B7280'}}>Access your 3D printing farm dashboard.</p>
+                    {error === 'OAuthAccountNotLinked' && (
+                        <p style={{color: '#EF4444', fontSize: '0.875rem', marginTop: '1rem'}}>
+                            An account with this email already exists. Please sign in with your existing account or link this Microsoft account from your profile settings.
+                        </p>
+                    )}
                 </div>
 
                 {/* Azure AD Sign In */}
