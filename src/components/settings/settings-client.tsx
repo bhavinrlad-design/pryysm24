@@ -26,15 +26,7 @@ import { Textarea } from '../ui/textarea'
 export function SettingsClient() {
     const { toast } = useToast();
     const { user, updateUserProfile, logout } = useAuth();
-    const { workspaceData, codeSettings: initialCodeSettings, updateCodeSettings, addSupportTicket } = useWorkspace() as {
-        workspaceData: any;
-        documents: Document[];
-        customers: any[];
-        codeSettings: CodeSettings | null;
-        updateCodeSettings: (newSettings: CodeSettings) => void;
-        supportTickets: any[];
-        addSupportTicket: (ticket: any) => void;
-    };
+    const { workspaceData, codeSettings: initialCodeSettings, updateCodeSettings, addSupportTicket } = useWorkspace();
 
     const router = useRouter();
     const fileInputRef = useRef<HTMLInputElement>(null);
