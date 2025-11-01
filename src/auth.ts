@@ -25,6 +25,29 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
       return token
     },
+    async linkAccount({ user, account, profile }) {
+      const existingUser = await prisma.user.findUnique({
+        where: { email: user.email },
+      });
+
+      if (existingUser) {
+        await prisma.account.create({
+          data: {
+            userId: existingUser.id,
+            type: account.type,
+            provider: account.provider,
+            providerAccountId: account.providerAccountId,
+            refresh_token: account.refresh_token,
+            access_token: account.access_token,
+            expires_at: account.expires_at,
+            token_type: account.token_type,
+            scope: account.scope,
+            id_token: account.id_token,
+            session_state: account.session_state,
+          },
+        });
+      }
+    },
   },
   pages: {
     signIn: '/login',
