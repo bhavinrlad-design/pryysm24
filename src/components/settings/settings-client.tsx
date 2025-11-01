@@ -323,7 +323,7 @@ export function SettingsClient() {
                                         <Label htmlFor={`code-${key}`} className="capitalize">{key.replace(/([A-Z])/g, ' $1')}</Label>
                                         <Input
                                             id={`code-${key}`}
-                                            value={codeSettings?.[key as keyof CodeSettings] || ''}
+                                            value={String(codeSettings?.[key as keyof CodeSettings] || '')}
                                             onChange={(e) => handleCodeSettingChange(key as keyof CodeSettings, e.target.value)}
                                             placeholder={String(initialCodeSettings[key as keyof CodeSettings] || '')}
                                         />
