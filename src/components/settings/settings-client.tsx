@@ -1,8 +1,8 @@
 "use client"
 
 import { useRef, useState, useEffect } from 'react'
-import { useAuth } from '../../hooks/auth'
-import { useToast } from '../ui/use-toast'
+import { useAuth } from '../../hooks/use-auth'
+import { useToast } from '../../hooks/use-toast'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
