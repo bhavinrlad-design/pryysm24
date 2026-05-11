@@ -119,3 +119,60 @@ model PrintJob {
   material    Material  @relation(fields: [materialId], references: [id])
   materialId  Int
 }
+
+// Robot Configuration for 3D Print Farm Automation
+model RobotConfig {
+  id            String   @id @default(cuid())
+  name          String
+  vendor        String   // ABB, FANUC, YASKAWA, KUKA
+  model         String
+  ipAddress     String
+  port          Int
+  protocol      String   // MODBUS_TCP, OPC_UA, REST_API
+  stationId     String
+  isActive      Boolean  @default(true)
+  maxPayload    Float?
+  reach         Float?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  tasks         RobotTask[]
+  events        RobotEvent[]
+}
+
+// Robot Task Management
+model RobotTask {
+  id            String   @id @default(cuid())
+  robotId       String
+  printerId     String
+  taskType      String   // PART_REMOVAL, BED_PREP, INSPECTION, MATERIAL_LOAD
+  status        String   @default("PENDING") // PENDING, IN_PROGRESS, COMPLETED, FAILED
+  priority      Int      @default(5)
+  parameters    Json?
+  errorMessage  String?
+  createdAt     DateTime @default(now())
+  startedAt     DateTime?
+  completedAt   DateTime?
+
+  robot         RobotConfig @relation(fields: [robotId], references: [id])
+
+  @@index([robotId])
+  @@index([printerId])
+  @@index([status])
+}
+
+// Robot Events Logging
+model RobotEvent {
+  id            String   @id @default(cuid())
+  robotId       String
+  eventType     String   // CONNECTION, DISCONNECTION, TASK_START, TASK_COMPLETE, ERROR, EMERGENCY_STOP
+  message       String?
+  data          Json?
+  timestamp     DateTime @default(now())
+
+  robot         RobotConfig @relation(fields: [robotId], references: [id])
+
+  @@index([robotId])
+  @@index([timestamp])
+  @@index([eventType])
+}
